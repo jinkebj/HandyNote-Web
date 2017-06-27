@@ -1,31 +1,59 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-      <br>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div>
+    <div>
+      <button @click="showContent">Show Content in Console</button><p />
+    </div>
+    <div id="editor"></div>
   </div>
 </template>
 
 <script>
+import 'quill/dist/quill.snow.css'
+import Quill from 'quill/dist/quill'
+import { ImageResize } from '../quill_modules/ImageResize'
+
 export default {
   name: 'hello',
+
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      quill: {}
+    }
+  },
+
+  mounted () {
+    Quill.register('modules/imageResize', ImageResize)
+
+    this.quill = new Quill(document.getElementById('editor'), {
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{'header': 1}, {'header': 2}],
+          [{'list': 'ordered'}, {'list': 'bullet'}],
+          [{'script': 'sub'}, {'script': 'super'}],
+          [{'indent': '-1'}, {'indent': '+1'}],
+          [{'direction': 'rtl'}],
+          [{'size': ['small', false, 'large', 'huge']}],
+          [{'header': [1, 2, 3, 4, 5, 6, false]}],
+          [{'color': []}, {'background': []}],
+          [{'font': []}],
+          [{'align': []}],
+          ['clean'],
+          ['link', 'image', 'video']
+        ],
+        imageResize: {
+          displaySize: true
+        }
+      },
+      placeholder: 'Compose an epic...',
+      theme: 'snow'
+    })
+  },
+
+  methods: {
+    showContent () {
+      console.log(JSON.stringify(this.quill.getContents()))
     }
   }
 }
@@ -33,21 +61,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
+#editor {
+  height: 800px
 }
 </style>

@@ -1,2 +1,1 @@
-build/*.js
-config/*.js
+// http://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories

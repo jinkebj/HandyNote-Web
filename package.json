@@ -1,7 +1,7 @@
 {
-  "name": "noteit",
+  "name": "HandeNote-Web",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "description": "HandyNote Web UI",
   "author": "jinkebj@126.com",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "quill": "^1.2.6",
     "vue": "^2.3.3",
     "vue-router": "^2.3.1"
   },
