@@ -9,7 +9,7 @@
 
 <script>
 import 'quill/dist/quill.snow.css'
-import Quill from 'quill/dist/quill'
+import Quill from 'quill'
 import { ImageResize } from '../quill_modules/ImageResize'
 
 export default {
@@ -53,7 +53,8 @@ export default {
 
   methods: {
     showContent () {
-      console.log(JSON.stringify(this.quill.getContents()))
+      console.log('quill.getContents() is:' + JSON.stringify(this.quill.getContents()))
+      console.log('quill.getText() is:' + JSON.stringify(this.quill.getText()))
     }
   }
 }

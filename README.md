@@ -5,6 +5,9 @@
 ## Build Setup
 
 ``` bash
+# Optional, set npm mirror to speed up npm install in China
+npm config set registry https://registry.npm.taobao.org
+
 # install dependencies
 npm install
 
