@@ -2,7 +2,7 @@
   "name": "HandyNote-Web",
   "version": "1.0.0",
   "description": "HandyNote Web UI",
-  "author": "jinkebj@126.com",
+  "author": "Jin Ke <jinkebj@126.com>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -10,6 +10,7 @@
     "build": "node build/build.js",
     "lint": "eslint --ext .js,.vue src"
   },
+  "license": "MIT",
   "dependencies": {
     "quill": "^1.2.6",
     "vue": "^2.3.3",
