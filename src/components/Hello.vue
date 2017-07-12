@@ -1,7 +1,11 @@
 <template>
   <div>
     <div>
-      <button @click="showContent">Show Content in Console</button><p />
+      <button @click="loadContent">Load Content</button>
+      <button @click="saveContent">Save Content</button>
+      <button @click="addContent">Add Content</button>
+      <button @click="showContent">Print to Console</button>
+      <p />
     </div>
     <div id="editor"></div>
   </div>
@@ -55,6 +59,46 @@ export default {
     showContent () {
       console.log('quill.getContents() is:' + JSON.stringify(this.quill.getContents()))
       console.log('quill.getText() is:' + JSON.stringify(this.quill.getText()))
+    },
+
+    addContent () {
+      this.$http.post(this.$baseAPIUrl + '/notes', {
+        name: 'my 3rd note',
+        text: this.quill.getText(),
+        contents: this.quill.getContents().ops
+      })
+      .then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+
+    saveContent () {
+      this.$http.post(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64', {
+        name: 'my 3rd note',
+        text: this.quill.getText(),
+        contents: this.quill.getContents().ops
+      })
+      .then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+
+    loadContent () {
+      let self = this
+      this.$http.get(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64')
+        .then(function (response) {
+          console.log(response)
+          self.quill.setContents(response.data.contents)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   }
 }

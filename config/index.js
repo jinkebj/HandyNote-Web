@@ -34,5 +34,6 @@ module.exports = {
     // In our experience, they generally work as expected,
     // just be aware of this issue when enabling this option.
     cssSourceMap: false
-  }
+  },
+  BaseAPIUrl: 'http://9.186.50.48:3000/api'
 }
