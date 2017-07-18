@@ -2,6 +2,13 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import axios from 'axios'
+
+import 'purecss/build/base.css'
+import 'purecss/build/grids.css'
+
+import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/en'
+
 import App from './App'
 import router from './router'
 import config from '../config'
@@ -9,6 +16,8 @@ import config from '../config'
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 Vue.prototype.$baseAPIUrl = config.BaseAPIUrl
+
+Vue.use(ElementUI, { locale })
 
 /* eslint-disable no-new */
 new Vue({
