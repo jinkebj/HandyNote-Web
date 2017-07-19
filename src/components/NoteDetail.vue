@@ -1,89 +1,135 @@
 <template>
-  <div class="email-content">
-      <div class="email-content-header pure-g">
-          <div class="pure-u-1-2">
-              <h1 class="email-content-title">Hello from Toronto</h1>
-              <p class="email-content-subtitle">
-                  From <a>Tilo Mitra</a> at <span>3:56pm, April 3, 2012</span>
-              </p>
-          </div>
+  <div>
+    <div class="note-content-header">
+      <h1 class="note-content-title">Sample Note</h1>
+      <p class="note-content-subtitle">
+          From <a>JK</a> at <span>3:56pm, April 3, 2017</span>
+      </p>
 
-          <div class="email-content-controls pure-u-1-2">
-              <button class="secondary-button pure-button">Reply</button>
-              <button class="secondary-button pure-button">Forward</button>
-              <button class="secondary-button pure-button">Move to</button>
-          </div>
+      <div class="note-content-controls">
+        <el-button @click="loadContent">Load Content</el-button>
+        <el-button @click="saveContent">Save Content</el-button>
+        <el-button @click="addContent">Add Content</el-button>
+        <el-button @click="showContent">Print to Console</el-button>
       </div>
+    </div>
 
-      <div class="email-content-body">
-          <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing
-elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-ut aliquip ex ea commodo consequat.
-          </p>
-          <p>
-              Duis aute irure dolor in reprehenderit in voluptate
-velit essecillum dolore eu fugiat nulla pariatur. Excepteur sint
-occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum.
-          </p>
-          <p>
-              Aliquam ac feugiat dolor. Proin mattis massa sit
-amet enim iaculis tincidunt. Mauris tempor mi vitae sem aliquet
-pharetra. Fusce in dui purus, nec malesuada mauris. Curabitur ornare
-arcu quis mi blandit laoreet. Vivamus imperdiet fermentum mauris, ac
-posuere urna tempor at. Duis pellentesque justo ac sapien aliquet
-egestas. Morbi enim mi, porta eget ullamcorper at, pharetra id lorem.
-          </p>
-          <p>
-              Donec sagittis dolor ut quam pharetra pretium varius
-in nibh. Suspendisse potenti. Donec imperdiet, velit vel adipiscing
-bibendum, leo eros tristique augue, eu rutrum lacus sapien vel quam. Nam
-orci arcu, luctus quis vestibulum ut, ullamcorper ut enim. Morbi semper
-erat quis orci aliquet condimentum. Nam interdum mauris sed massa
-dignissim rhoncus.
-          </p>
-          <p>
-              Regards,<br>
-              Tilo
-          </p>
-      </div>
+    <div id="editor"></div>
   </div>
 </template>
 
 <style scoped>
-/* Email Content Styles */
-.email-content-header, .email-content-body, .email-content-footer {
+#editor {
+  min-height: 500px;
+  border: 0px;
+}
+.note-content-header {
     padding: 1em 2em;
 }
-.email-content-header {
-    border-bottom: 1px solid #ddd;
-}
-.email-content-title {
+
+.note-content-title {
     margin: 0.5em 0 0;
 }
-.email-content-subtitle {
+.note-content-subtitle {
     font-size: 1em;
     margin: 0;
     font-weight: normal;
 }
-    .email-content-subtitle span {
-        color: #999;
-    }
-.email-content-controls {
+.note-content-subtitle span {
+    color: #999;
+}
+.note-content-controls {
     margin-top: 2em;
     text-align: right;
-}
-.email-content-controls .secondary-button {
-    margin-bottom: 0.3em;
 }
 </style>
 
 <script>
+import 'quill/dist/quill.snow.css'
+import Quill from 'quill'
+import { ImageResize } from '../quill_modules/ImageResize'
+
 export default {
   data () {
     return {
+      quill: {}
+    }
+  },
+
+  mounted () {
+    Quill.register('modules/imageResize', ImageResize)
+
+    this.quill = new Quill(document.getElementById('editor'), {
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{'header': 1}, {'header': 2}],
+          [{'list': 'ordered'}, {'list': 'bullet'}],
+          [{'script': 'sub'}, {'script': 'super'}],
+          [{'indent': '-1'}, {'indent': '+1'}],
+          [{'direction': 'rtl'}],
+          [{'size': ['small', false, 'large', 'huge']}],
+          [{'header': [1, 2, 3, 4, 5, 6, false]}],
+          [{'color': []}, {'background': []}],
+          [{'font': []}],
+          [{'align': []}],
+          ['clean'],
+          ['link', 'image', 'video']
+        ],
+        imageResize: {
+          displaySize: true
+        }
+      },
+      placeholder: 'Compose an epic...',
+      theme: 'snow'
+    })
+  },
+
+  methods: {
+    showContent () {
+      console.log('quill.getContents() is:' + JSON.stringify(this.quill.getContents()))
+      console.log('quill.getText() is:' + JSON.stringify(this.quill.getText()))
+    },
+
+    addContent () {
+      this.$http.post(this.$baseAPIUrl + '/notes', {
+        name: 'my 3rd note',
+        text: this.quill.getText(),
+        contents: this.quill.getContents().ops
+      })
+      .then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+
+    saveContent () {
+      this.$http.post(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64', {
+        name: 'my 3rd note',
+        text: this.quill.getText(),
+        contents: this.quill.getContents().ops
+      })
+      .then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
+
+    loadContent () {
+      let self = this
+      this.$http.get(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64')
+        .then(function (response) {
+          console.log(response)
+          self.quill.setContents(response.data.contents)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   }
 }

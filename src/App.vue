@@ -1,61 +1,34 @@
 <template>
-  <!-- <div>
-    <my-header></my-header>
-    <router-view></router-view>
-  </div> -->
-<div class="main-content">
+  <div>
+    <el-row>
+      <el-col :span="24">
+        <my-header></my-header>
+      </el-col>
+    </el-row>
 
+    <el-row>
+      <el-col :span="3">
+        <my-folder></my-folder>
+      </el-col>
 
-<div class="pure-g">
-  <div class="pure-u-1">
-    <my-header></my-header>
+      <el-col :span="4">
+        <my-note-list></my-note-list>
+      </el-col>
+
+      <el-col :span="17">
+        <my-note-detail></my-note-detail>
+      </el-col>
+    </el-row>
   </div>
-</div>
-<div class="pure-g">
-    <div class="pure-u-1-5">
-      <my-folder></my-folder>
-    </div>
-
-    <div class="pure-u-1-5">
-      <my-note-list></my-note-list>
-    </div>
-
-    <div class="pure-u-3-5">
-      <my-note-detail></my-note-detail>
-    </div>
-</div>
-
-</div>
 </template>
 
 <style>
-.main-content {
+/*** base style apply to whole app ***/
+body {
+  font-family: sans-serif;
+  margin: 0px;
   border-bottom: 1px solid #ddd;
 }
-/*
- * -- HELPER STYLES --
- * Over-riding some of the .pure-button styles to make my buttons look unique
- */
-.primary-button,
-.secondary-button {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-radius: 20px;
-}
-.primary-button {
-    color: #fff;
-    background: #1b98f8;
-    margin: 1em 0;
-}
-.secondary-button {
-    background: #fff;
-    border: 1px solid #ddd;
-    color: #666;
-    padding: 0.5em 2em;
-    font-size: 80%;
-}
-
 </style>
 
 <script>
