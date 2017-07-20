@@ -1,53 +1,46 @@
 <template>
   <div>
-    <div class="note-content-header">
-      <h1 class="note-content-title">Sample Note</h1>
-      <p class="note-content-subtitle">
-          From <a>JK</a> at <span>3:56pm, April 3, 2017</span>
-      </p>
+    <div class="note-header">
+      <div class="note-title">
+        Sample Note
+      </div>
 
-      <div class="note-content-controls">
-        <el-button @click="loadContent">Load Content</el-button>
+      <div class="note-controls">
         <el-button @click="saveContent">Save Content</el-button>
         <el-button @click="addContent">Add Content</el-button>
-        <el-button @click="showContent">Print to Console</el-button>
       </div>
-    </div>
 
-    <div id="editor"></div>
+      <div class="clear"></div>
+    </div>
+    <div id="note-editor"></div>
   </div>
 </template>
 
 <style scoped>
-#editor {
+#note-editor {
   min-height: 500px;
   border: 0px;
 }
-.note-content-header {
-    padding: 1em 2em;
+.note-header {
+  padding: 1em 1em;
 }
-
-.note-content-title {
-    margin: 0.5em 0 0;
+.note-title {
+  float: left;
+  font-size: 150%;
+  padding-top: 5px;
 }
-.note-content-subtitle {
-    font-size: 1em;
-    margin: 0;
-    font-weight: normal;
+.note-controls {
+  float: right;
 }
-.note-content-subtitle span {
-    color: #999;
-}
-.note-content-controls {
-    margin-top: 2em;
-    text-align: right;
+.clear {
+  clear: both;
 }
 </style>
 
 <script>
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
-import { ImageResize } from '../quill_modules/ImageResize'
+import { ImageResize } from '@/quill_modules/ImageResize'
 
 export default {
   data () {
@@ -56,19 +49,21 @@ export default {
     }
   },
 
+  watch: {
+    $route: 'loadContent'
+  },
+
   mounted () {
     Quill.register('modules/imageResize', ImageResize)
 
-    this.quill = new Quill(document.getElementById('editor'), {
+    this.quill = new Quill(document.getElementById('note-editor'), {
       modules: {
         toolbar: [
           ['bold', 'italic', 'underline', 'strike'],
           ['blockquote', 'code-block'],
-          [{'header': 1}, {'header': 2}],
           [{'list': 'ordered'}, {'list': 'bullet'}],
           [{'script': 'sub'}, {'script': 'super'}],
           [{'indent': '-1'}, {'indent': '+1'}],
-          [{'direction': 'rtl'}],
           [{'size': ['small', false, 'large', 'huge']}],
           [{'header': [1, 2, 3, 4, 5, 6, false]}],
           [{'color': []}, {'background': []}],
@@ -84,14 +79,11 @@ export default {
       placeholder: 'Compose an epic...',
       theme: 'snow'
     })
+
+    this.loadContent()
   },
 
   methods: {
-    showContent () {
-      console.log('quill.getContents() is:' + JSON.stringify(this.quill.getContents()))
-      console.log('quill.getText() is:' + JSON.stringify(this.quill.getText()))
-    },
-
     addContent () {
       this.$http.post(this.$baseAPIUrl + '/notes', {
         name: 'my 3rd note',
@@ -107,7 +99,7 @@ export default {
     },
 
     saveContent () {
-      this.$http.post(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64', {
+      this.$http.post(this.$baseAPIUrl + '/notes/' + this.$route.params.id, {
         name: 'my 3rd note',
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
@@ -122,9 +114,8 @@ export default {
 
     loadContent () {
       let self = this
-      this.$http.get(this.$baseAPIUrl + '/notes/275532b0-66dd-11e7-9405-9dbbc67dfe64')
+      this.$http.get(this.$baseAPIUrl + '/notes/' + this.$route.params.id)
         .then(function (response) {
-          console.log(response)
           self.quill.setContents(response.data.contents)
         })
         .catch(function (error) {

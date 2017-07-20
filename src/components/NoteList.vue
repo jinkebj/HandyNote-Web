@@ -1,27 +1,15 @@
 <template>
   <div class="list-content">
-    <div class="list-item list-item-selected">
-      <h5 class="list-item-name">Tilo Mitra</h5>
-      <h4 class="list-item-subject">Hello from Toronto</h4>
-      <p class="list-item-desc">
-        Hey, I just wanted to check in with you from Toronto. I got here earlier today.
-      </p>
-    </div>
-
-    <div class="list-item list-item-unread">
-      <h5 class="list-item-name">Eric Ferraiuolo</h5>
-      <h4 class="list-item-subject">Re: Pull Requests</h4>
-      <p class="list-item-desc">
-        Hey, I had some feedback for pull request #51. We should center the menu so it looks better on mobile.
-      </p>
-    </div>
-
-    <div class="list-item">
-      <h5 class="list-item-name">YUI Library</h5>
-      <h4 class="list-item-subject">You have 5 bugs assigned to you</h4>
-      <p class="list-item-desc">
-        Duis aute irure dolor in reprehenderit in voluptate velit essecillum dolore eu fugiat nulla.
-      </p>
+    <div v-for="noteItem in noteItems">
+      <router-link :to="{ path: '/notes/' + noteItem._id}">
+        <div class="list-item" v-bind:class="$route.params.id === noteItem._id ? 'list-item-selected' : ''">
+          <h4 class="list-item-subject">{{noteItem.name}}</h4>
+          <p class="list-item-desc">
+            {{noteItem.text}}
+          </p>
+          <h5 class="list-item-name">{{noteItem.updated_at}}</h5>
+        </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -33,15 +21,23 @@
   min-height: 800px;
 }
 
+.list-content a {
+  text-decoration: none;
+  outline: none;
+  color: #434343;
+}
+
 .list-item {
     padding: 0.9em 1em;
     border-bottom: 1px solid #ddd;
 }
 
+.list-item:hover {
+  cursor: pointer;
+}
+
 .list-item-selected {
   background: #eee;
-}
-.list-item-unread {
   border-left: 6px solid #1b98f8;
 }
 
@@ -49,10 +45,12 @@
 .list-item-subject {
   margin: 0;
 }
+
 .list-item-name {
   text-transform: uppercase;
   color: #999;
 }
+
 .list-item-desc {
   font-size: 80%;
   margin: 0.4em 0;
@@ -63,6 +61,24 @@
 export default {
   data () {
     return {
+      noteItems: []
+    }
+  },
+
+  mounted () {
+    this.loadNoteList()
+  },
+
+  methods: {
+    loadNoteList () {
+      const self = this
+      this.$http.get(this.$baseAPIUrl + '/notes')
+        .then(function (response) {
+          self.noteItems = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   }
 }

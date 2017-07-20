@@ -16,7 +16,7 @@
       </el-col>
 
       <el-col :span="17">
-        <my-note-detail></my-note-detail>
+        <router-view></router-view>
       </el-col>
     </el-row>
   </div>
@@ -32,18 +32,16 @@ body {
 </style>
 
 <script>
-import MyHeader from './components/Header'
-import MyFolder from './components/Folder'
-import MyNoteList from './components/NoteList'
-import MyNoteDetail from './components/NoteDetail'
+import MyHeader from '@/components/Header'
+import MyFolder from '@/components/Folder'
+import MyNoteList from '@/components/NoteList'
 
 export default {
   name: 'app',
   components: {
     MyHeader,
     MyFolder,
-    MyNoteList,
-    MyNoteDetail
+    MyNoteList
   }
 }
 </script>

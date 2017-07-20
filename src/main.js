@@ -7,9 +7,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import locale from 'element-ui/lib/locale/lang/en'
 
-import App from './App'
-import router from './router'
-import config from '../config'
+import App from '@/App'
+import router from '@/router'
+import config from '@/../config'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
