@@ -7,7 +7,7 @@
           <p class="list-item-desc">
             {{noteItem.text}}
           </p>
-          <h5 class="list-item-name">{{noteItem.updated_at}}</h5>
+          <h5 class="list-item-time">{{noteItem.updated_at | fmtTime}}</h5>
         </div>
       </router-link>
     </div>
@@ -28,12 +28,13 @@
 }
 
 .list-item {
-    padding: 0.9em 1em;
+    padding: 15px 15px;
     border-bottom: 1px solid #ddd;
 }
 
 .list-item:hover {
   cursor: pointer;
+  background: #F5F5F5;
 }
 
 .list-item-selected {
@@ -41,28 +42,34 @@
   border-left: 6px solid #1b98f8;
 }
 
-.list-item-name,
+.list-item-time,
 .list-item-subject {
   margin: 0;
 }
 
-.list-item-name {
-  text-transform: uppercase;
+.list-item-time {
   color: #999;
 }
 
 .list-item-desc {
   font-size: 80%;
-  margin: 0.4em 0;
+  margin: 5px 0;
 }
 </style>
 
 <script>
+import {fmtTime} from '@/util'
+import Model from '@/models'
+
 export default {
   data () {
     return {
       noteItems: []
     }
+  },
+
+  filters: {
+    fmtTime
   },
 
   mounted () {
@@ -72,7 +79,7 @@ export default {
   methods: {
     loadNoteList () {
       const self = this
-      this.$http.get(this.$baseAPIUrl + '/notes')
+      Model.getNoteList()
         .then(function (response) {
           self.noteItems = response.data
         })

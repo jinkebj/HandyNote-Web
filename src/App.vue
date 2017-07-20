@@ -26,7 +26,7 @@
 /*** base style apply to whole app ***/
 body {
   font-family: sans-serif;
-  margin: 0px;
+  margin: 0;
   border-bottom: 1px solid #ddd;
 }
 </style>

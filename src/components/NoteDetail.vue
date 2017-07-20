@@ -6,8 +6,9 @@
       </div>
 
       <div class="note-controls">
-        <el-button @click="saveContent">Save Content</el-button>
-        <el-button @click="addContent">Add Content</el-button>
+        <el-button @click="saveNote">Save</el-button>
+        <el-button @click="deleteNote">Delete</el-button>
+        <el-button @click="addNote">Add</el-button>
       </div>
 
       <div class="clear"></div>
@@ -18,11 +19,11 @@
 
 <style scoped>
 #note-editor {
-  min-height: 500px;
-  border: 0px;
+  min-height: 600px;
+  border: 0;
 }
 .note-header {
-  padding: 1em 1em;
+  padding: 15px 15px;
 }
 .note-title {
   float: left;
@@ -38,6 +39,7 @@
 </style>
 
 <script>
+import Model from '@/models'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageResize } from '@/quill_modules/ImageResize'
@@ -84,37 +86,47 @@ export default {
   },
 
   methods: {
-    addContent () {
-      this.$http.post(this.$baseAPIUrl + '/notes', {
+    addNote () {
+      Model.addNote({
         name: 'my 3rd note',
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
-      .then(function (response) {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     },
 
-    saveContent () {
-      this.$http.post(this.$baseAPIUrl + '/notes/' + this.$route.params.id, {
+    saveNote () {
+      Model.updateNote(this.$route.params.id, {
         name: 'my 3rd note',
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
-      .then(function (response) {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+
+    deleteNote () {
+      Model.deleteNote(this.$route.params.id)
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     },
 
     loadContent () {
       let self = this
-      this.$http.get(this.$baseAPIUrl + '/notes/' + this.$route.params.id)
+      Model.getNote(this.$route.params.id)
         .then(function (response) {
           self.quill.setContents(response.data.contents)
         })
