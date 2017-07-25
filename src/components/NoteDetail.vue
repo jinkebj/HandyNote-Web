@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="note-container">
     <div class="note-header">
       <div class="note-title">
         Sample Note
@@ -18,23 +18,31 @@
 </template>
 
 <style scoped>
-#note-editor {
-  min-height: 600px;
-  border: 0;
+.note-container {
+  height: calc(100vh - 160px);
 }
+
 .note-header {
   padding: 15px 15px;
 }
+
 .note-title {
   float: left;
   font-size: 150%;
   padding-top: 5px;
 }
+
 .note-controls {
   float: right;
 }
+
 .clear {
   clear: both;
+}
+
+#note-editor {
+  border: 0;
+  font-size: 18px;
 }
 </style>
 
@@ -58,7 +66,7 @@ export default {
   mounted () {
     Quill.register('modules/imageResize', ImageResize)
 
-    this.quill = new Quill(document.getElementById('note-editor'), {
+    this.quill = new Quill('#note-editor', {
       modules: {
         toolbar: [
           ['bold', 'italic', 'underline', 'strike'],

@@ -2,7 +2,7 @@
   <div class="list-content">
     <div v-for="noteItem in noteItems">
       <router-link :to="{ path: '/notes/' + noteItem._id}">
-        <div class="list-item" v-bind:class="$route.params.id === noteItem._id ? 'list-item-selected' : ''">
+        <div class="list-item" v-bind:class="$route.params.id === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
           <h4 class="list-item-subject">{{noteItem.name}}</h4>
           <p class="list-item-desc">
             {{noteItem.text}}
@@ -15,12 +15,6 @@
 </template>
 
 <style scoped>
-.list-content {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  min-height: 800px;
-}
-
 .list-content a {
   text-decoration: none;
   outline: none;
@@ -28,17 +22,17 @@
 }
 
 .list-item {
-    padding: 15px 15px;
-    border-bottom: 1px solid #ddd;
+  padding: 15px 15px;
+  border-bottom: 1px solid #ddd;
 }
 
-.list-item:hover {
+.list-item-unselected:hover {
   cursor: pointer;
-  background: #F5F5F5;
+  background: #F6F7F9;
 }
 
 .list-item-selected {
-  background: #eee;
+  background: #EAF0FB;
   border-left: 6px solid #1b98f8;
 }
 
