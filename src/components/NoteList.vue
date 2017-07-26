@@ -3,9 +3,9 @@
     <div v-for="noteItem in noteItems">
       <router-link :to="{ path: '/notes/' + noteItem._id}">
         <div class="list-item" v-bind:class="$route.params.id === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
-          <h4 class="list-item-subject">{{noteItem.name}}</h4>
+          <h4 class="list-item-subject">{{noteItem.name | truncate(50)}}</h4>
           <p class="list-item-desc">
-            {{noteItem.text.substr(0, 200)}}
+            {{noteItem.text | truncate(200)}}
           </p>
           <h5 class="list-item-time">{{noteItem.updated_at | fmtTime}}</h5>
         </div>
@@ -74,6 +74,7 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
+          self.$message.error('Failed to load note list!')
         })
     }
   }

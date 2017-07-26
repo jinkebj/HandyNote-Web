@@ -50,7 +50,7 @@ html, body {
   flex: 1; /* same as flex: 1 1 auto; */
 
   display: flex;
-  flex-direction: row;
+  flex-flow: row;
 
   justify-content: flex-start; /* align items in Main Axis */
   align-items: stretch; /* align items in Cross Axis */

@@ -1,9 +1,7 @@
 <template>
   <div class="note-container">
     <div class="note-header">
-      <div class="note-title">
-        Sample Note
-      </div>
+      <input type="text" class="note-title" v-model="noteName">
 
       <div class="note-controls">
         <el-button @click="saveNote">Save</el-button>
@@ -11,7 +9,6 @@
         <el-button @click="addNote">Add</el-button>
       </div>
 
-      <div class="clear"></div>
     </div>
     <div id="note-editor"></div>
   </div>
@@ -24,20 +21,25 @@
 
 .note-header {
   padding: 15px 15px;
+
+  display: flex;
+  flex-flow: row;
 }
 
 .note-title {
-  float: left;
+  border: none;
+  outline: none;
   font-size: 150%;
-  padding-top: 5px;
+
+  flex: 1;
 }
 
 .note-controls {
-  float: right;
-}
+  flex: 0 250px;
 
-.clear {
-  clear: both;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-end;
 }
 
 #note-editor {
@@ -55,7 +57,8 @@ import { ImageResize } from '@/quill_modules/ImageResize'
 export default {
   data () {
     return {
-      quill: {}
+      quill: {},
+      noteName: 'No title'
     }
   },
 
@@ -95,51 +98,71 @@ export default {
 
   methods: {
     addNote () {
+      const self = this
       Model.addNote({
-        name: 'my 3rd note',
+        name: this.noteName,
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
-          console.log(response)
+          // console.log(response)
         })
         .catch(function (error) {
           console.log(error)
+          self.$message.error('Add note failed!')
         })
     },
 
     saveNote () {
+      const self = this
       Model.updateNote(this.$route.params.id, {
-        name: 'my 3rd note',
+        name: this.noteName,
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
-          console.log(response)
+          self.$message({
+            message: 'Save note successfully!',
+            type: 'success'
+          })
         })
         .catch(function (error) {
           console.log(error)
+          self.$message.error('Save note failed!')
         })
     },
 
     deleteNote () {
-      Model.deleteNote(this.$route.params.id)
-        .then(function (response) {
-          console.log(response)
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
+      const self = this
+      self.$confirm('You have selected to delete this note, continue?', 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        Model.deleteNote(self.$route.params.id)
+          .then(function (response) {
+            self.$message({
+              message: 'Delete note successfully!',
+              type: 'success'
+            })
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Delete note failed!')
+          })
+      })
     },
 
     loadContent () {
-      let self = this
+      const self = this
       Model.getNote(this.$route.params.id)
         .then(function (response) {
+          self.noteName = response.data.name
           self.quill.setContents(response.data.contents)
         })
         .catch(function (error) {
           console.log(error)
+          self.$message.error('Failed to load note!')
         })
     }
   }
