@@ -6,7 +6,7 @@
 
     <div class="content auto-overflow">
       <div class="note-folder auto-overflow">
-        <my-folder></my-folder>
+        <my-note-folder></my-note-folder>
       </div>
       <div class="note-list auto-overflow">
         <my-note-list></my-note-list>
@@ -82,14 +82,14 @@ html, body {
 
 <script>
 import MyHeader from '@/components/Header'
-import MyFolder from '@/components/Folder'
+import MyNoteFolder from '@/components/NoteFolder'
 import MyNoteList from '@/components/NoteList'
 
 export default {
   name: 'app',
   components: {
     MyHeader,
-    MyFolder,
+    MyNoteFolder,
     MyNoteList
   }
 }

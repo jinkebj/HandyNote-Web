@@ -8,8 +8,14 @@ import locale from 'element-ui/lib/locale/lang/en'
 
 import App from '@/App'
 import router from '@/router'
+import * as filters from '@/util/filters'
 
 Vue.config.productionTip = false
+
+// register filters
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 Vue.use(ElementUI, { locale })
 

@@ -5,7 +5,7 @@
         <div class="list-item" v-bind:class="$route.params.id === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
           <h4 class="list-item-subject">{{noteItem.name}}</h4>
           <p class="list-item-desc">
-            {{noteItem.text}}
+            {{noteItem.text.substr(0, 200)}}
           </p>
           <h5 class="list-item-time">{{noteItem.updated_at | fmtTime}}</h5>
         </div>
@@ -52,7 +52,6 @@
 </style>
 
 <script>
-import {fmtTime} from '@/util'
 import Model from '@/models'
 
 export default {
@@ -60,10 +59,6 @@ export default {
     return {
       noteItems: []
     }
-  },
-
-  filters: {
-    fmtTime
   },
 
   mounted () {
