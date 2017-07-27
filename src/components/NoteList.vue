@@ -33,7 +33,7 @@
 
 .list-item-selected {
   background: #EAF0FB;
-  border-left: 6px solid #1b98f8;
+  border-left: 6px solid #13CE66;
 }
 
 .list-item-time,

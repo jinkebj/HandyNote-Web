@@ -1,11 +1,12 @@
 <template>
   <div class="container">
     <div class="header">
+      <el-button type="primary" icon="menu" @click="showFolder = !showFolder"></el-button>
       <my-header></my-header>
     </div>
 
     <div class="content auto-overflow">
-      <div class="note-folder auto-overflow">
+      <div class="note-folder auto-overflow" v-show="showFolder">
         <my-note-folder></my-note-folder>
       </div>
       <div class="note-list auto-overflow">
@@ -44,7 +45,12 @@ html, body {
 
 .header {
   flex: 0 50px;
-  background: #398DEE;
+  background: #20A0FF;
+}
+
+.header .el-button {
+  width: 50px;
+  height: 50px;
 }
 
 .content {
@@ -95,6 +101,12 @@ export default {
     MyNoteFolder,
     MyNoteList,
     MyNoteDetail
+  },
+
+  data () {
+    return {
+      showFolder: true
+    }
   }
 }
 </script>
