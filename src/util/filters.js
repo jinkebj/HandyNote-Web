@@ -5,7 +5,7 @@ export const fmtTime = (time) => {
 }
 
 export const truncate = (str, size) => {
-  if (str.length <= size) {
+  if (str === undefined || str.length <= size) {
     return str
   } else {
     return str.substr(0, size) + ' ...'

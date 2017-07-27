@@ -4,9 +4,8 @@
       <input type="text" class="note-title" v-model="noteName">
 
       <div class="note-controls">
-        <el-button @click="saveNote">Save</el-button>
+        <el-button @click="updateNote">Save</el-button>
         <el-button @click="deleteNote">Delete</el-button>
-        <el-button @click="addNote">Add</el-button>
       </div>
 
     </div>
@@ -58,12 +57,9 @@ export default {
   data () {
     return {
       quill: {},
-      noteName: 'No title'
+      noteName: '',
+      noteId: ''
     }
-  },
-
-  watch: {
-    $route: 'loadContent'
   },
 
   mounted () {
@@ -93,34 +89,22 @@ export default {
       theme: 'snow'
     })
 
-    this.loadContent()
+    this.$bus.$on('loadNoteWithId', (id) => {
+      this.noteId = id
+      this.loadNote()
+    })
   },
 
   methods: {
-    addNote () {
+    updateNote () {
       const self = this
-      Model.addNote({
+      Model.updateNote(self.noteId, {
         name: this.noteName,
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
-          // console.log(response)
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.$message.error('Add note failed!')
-        })
-    },
-
-    saveNote () {
-      const self = this
-      Model.updateNote(this.$route.params.id, {
-        name: this.noteName,
-        text: this.quill.getText(),
-        contents: this.quill.getContents().ops
-      })
-        .then(function (response) {
+          self.$bus.$emit('refreshNoteList', response.data._id)
           self.$message({
             message: 'Save note successfully!',
             type: 'success'
@@ -139,8 +123,9 @@ export default {
         cancelButtonText: 'No',
         type: 'warning'
       }).then(() => {
-        Model.deleteNote(self.$route.params.id)
+        Model.deleteNote(self.noteId)
           .then(function (response) {
+            self.$bus.$emit('refreshNoteList', '')
             self.$message({
               message: 'Delete note successfully!',
               type: 'success'
@@ -153,9 +138,9 @@ export default {
       })
     },
 
-    loadContent () {
+    loadNote () {
       const self = this
-      Model.getNote(this.$route.params.id)
+      Model.getNote(self.noteId)
         .then(function (response) {
           self.noteName = response.data.name
           self.quill.setContents(response.data.contents)

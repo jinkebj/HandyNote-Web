@@ -12,7 +12,8 @@
         <my-note-list></my-note-list>
       </div>
       <div class="note-detail hide-overflow">
-        <router-view></router-view>
+        <!-- <router-view></router-view> -->
+        <my-note-detail></my-note-detail>
       </div>
     </div>
   </div>
@@ -84,13 +85,16 @@ html, body {
 import MyHeader from '@/components/Header'
 import MyNoteFolder from '@/components/NoteFolder'
 import MyNoteList from '@/components/NoteList'
+import MyNoteDetail from '@/components/NoteDetail'
 
 export default {
   name: 'app',
+
   components: {
     MyHeader,
     MyNoteFolder,
-    MyNoteList
+    MyNoteList,
+    MyNoteDetail
   }
 }
 </script>
