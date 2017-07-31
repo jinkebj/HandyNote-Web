@@ -43,7 +43,7 @@
 
 #note-editor {
   border: 0;
-  font-size: 18px;
+  font-size: 16px;
 }
 </style>
 
@@ -91,6 +91,7 @@ export default {
 
     this.$bus.$on('loadNoteWithId', (id) => {
       this.noteId = id
+      this.quill.setText('loading...')
       this.loadNote()
     })
   },

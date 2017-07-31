@@ -5,7 +5,7 @@
         <div class="list-item" :class="selectedNoteId === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
           <h4 class="list-item-subject">{{noteItem.name | truncate(50)}}</h4>
           <p class="list-item-desc">
-            {{noteItem.text | truncate(200)}}
+            {{noteItem.digest | truncate(100)}}
           </p>
           <h5 class="list-item-time">{{noteItem.updated_at | fmtTime}}</h5>
         </div>
@@ -33,7 +33,7 @@
 
 .list-item-selected {
   background: #EAF0FB;
-  border-left: 6px solid #13CE66;
+  /*border-left: 6px solid #13CE66;*/
 }
 
 .list-item-time,

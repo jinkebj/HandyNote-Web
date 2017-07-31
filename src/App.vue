@@ -36,7 +36,7 @@ html, body {
   height: 100%;
 
   display: flex;
-  flex-direction: column;
+  flex-flow: column;
 
   justify-content: flex-start; /* align items in Main Axis */
   align-items: stretch; /* align items in Cross Axis */
