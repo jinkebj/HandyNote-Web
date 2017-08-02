@@ -47,6 +47,13 @@
 }
 </style>
 
+<style>
+.ql-toolbar.ql-snow {
+  border-left: none;
+  border-right: none;
+}
+</style>
+
 <script>
 import Model from '@/models'
 import 'quill/dist/quill.snow.css'
@@ -68,24 +75,19 @@ export default {
     this.quill = new Quill('#note-editor', {
       modules: {
         toolbar: [
+          [{'header': [1, 2, 3, 4, 5, 6, false]}, {'font': []}, {'size': ['small', false, 'large', 'huge']}],
           ['bold', 'italic', 'underline', 'strike'],
-          ['blockquote', 'code-block'],
-          [{'list': 'ordered'}, {'list': 'bullet'}],
-          [{'script': 'sub'}, {'script': 'super'}],
-          [{'indent': '-1'}, {'indent': '+1'}],
-          [{'size': ['small', false, 'large', 'huge']}],
-          [{'header': [1, 2, 3, 4, 5, 6, false]}],
           [{'color': []}, {'background': []}],
-          [{'font': []}],
-          [{'align': []}],
-          ['clean'],
-          ['link', 'image', 'video']
+          [{'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}],
+          // [{'script': 'sub'}, {'script': 'super'}],
+          ['blockquote', 'code-block', 'clean'],
+          // ['video'],
+          ['link', 'image']
         ],
         imageResize: {
           displaySize: true
         }
       },
-      placeholder: 'Compose an epic...',
       theme: 'snow'
     })
 

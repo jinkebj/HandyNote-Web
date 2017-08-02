@@ -44,7 +44,7 @@
 
 .my-recent {
   flex: 0;
-  padding: 15px 15px;
+  padding: 10px 15px;
 }
 
 .my-recent:hover,
@@ -55,7 +55,7 @@
 
 .my-trash {
   flex: 0;
-  padding: 15px 15px;
+  padding: 10px 15px;
 
   display: flex;
   flex-flow: row;
