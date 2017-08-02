@@ -3,7 +3,7 @@
     <el-button class="my-action" @click="addNote">Compose</el-button>
     <div class="my-recent"><i class="el-icon-date"></i>Recent Notes</div>
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" default-expand-all highlight-current
-      :expand-on-click-node="false" :render-content="renderContent" @node-click="handleNodeClick">
+      :expand-on-click-node="false" :render-content="renderContent" @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
     <div class="my-trash">
       <i class="el-icon-delete2"></i>
@@ -14,8 +14,16 @@
             <i class="el-icon-setting el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item class="my-folder-action-item">Empty Trash</el-dropdown-item>
-            <el-dropdown-item class="my-folder-action-item">Restore All</el-dropdown-item>
+            <el-dropdown-item class="my-folder-action-item">
+              <span class="my-folder-action-item-inner">
+                Empty Trash
+              </span>
+            </el-dropdown-item>
+            <el-dropdown-item class="my-folder-action-item">
+              <span class="my-folder-action-item-inner">
+                Restore All
+              </span>
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </span>
@@ -129,6 +137,15 @@
 
 .my-folder-action-item {
   font-size: 14px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: row;
+}
+
+.my-folder-action-item-inner {
+  flex: 1;
+  padding: 0px 10px;
 }
 </style>
 
@@ -141,25 +158,22 @@ export default {
       noteFolders: [
         {
           type: 0,
+          id: 'mytest-Root',
           label: 'My Folders',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
+          ancestor_ids: [],
+          children: []
         }
       ],
       defaultProps: {
         children: 'children',
         label: 'label'
-      }
+      },
+      selectedFolderId: 'mytest-Root'
     }
+  },
+
+  mounted () {
+    this.loadFolderList()
   },
 
   methods: {
@@ -181,8 +195,112 @@ export default {
         })
     },
 
-    handleNodeClick (data) {
-      console.log(data)
+    loadFolderList () {
+      const self = this
+      Model.getFolderList()
+        .then(function (response) {
+          self.prepareFolderData(response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Failed to load folder list!')
+        })
+    },
+
+    prepareFolderData (inputData) {
+      if (inputData.length === 0) return
+      let outputData = {}
+      outputData.id = inputData[0]._id
+      outputData.label = inputData[0].name
+      outputData.ancestor_ids = inputData[0].ancestor_ids
+      this.noteFolders[0].children.push(outputData)
+    },
+
+    addFolder (store, data) {
+      console.log('Add folder: ' + JSON.stringify(data))
+
+      const self = this
+      self.$prompt('Please input folder name', 'New Sub Folder', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        inputPattern: /[A-Za-z0-9_-]+/,
+        inputErrorMessage: 'Invalid name!'
+      }).then(({ value }) => {
+        let newAncestorIds = data.ancestor_ids.concat([data.id])
+        Model.addFolder({
+          name: value,
+          parent_id: data.id,
+          ancestor_ids: newAncestorIds
+        })
+          .then(function (response) {
+            self.$message({
+              message: 'Add folder successfully!',
+              type: 'success'
+            })
+            store.append({ id: response.data._id, label: response.data.name, ancestor_ids: newAncestorIds, children: [] }, data)
+            self.selectedFolderId = response.data._id
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Add folder failed!')
+          })
+      })
+    },
+
+    deleteFolder (store, data) {
+      console.log('Delete folder: ' + JSON.stringify(data))
+
+      const self = this
+      self.$confirm('You have selected to delete this folder, all related subfolder will be deleted too, this action can NOT be undone, continue?', 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        Model.deleteFolder(data.id)
+          .then(function (response) {
+            self.$message({
+              message: 'Delete folder successfully!',
+              type: 'success'
+            })
+            store.remove(data)
+            self.selectedFolderId = data.ancestor_ids[data.ancestor_ids.length - 1]
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Delete folder failed!')
+          })
+      })
+    },
+
+    renameFolder (store, data) {
+      console.log('Rename folder: ' + JSON.stringify(data))
+
+      const self = this
+      self.$prompt('Please input folder name', 'Rename Folder', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        inputPattern: /[A-Za-z0-9_-]+/,
+        inputErrorMessage: 'Invalid name!'
+      }).then(({ value }) => {
+        Model.updateFolder(data.id, {
+          name: value
+        })
+          .then(function (response) {
+            self.$message({
+              message: 'Rename folder successfully!',
+              type: 'success'
+            })
+            store.getNode(data).data.label = value
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Rename folder failed!')
+          })
+      })
+    },
+
+    selectFolder (data) {
+      console.log('Select folder: ' + JSON.stringify(data))
     },
 
     renderContent (h, { node, data, store }) {
@@ -198,7 +316,11 @@ export default {
                   <i class="el-icon-setting el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item class="my-folder-action-item">New Sub Folder</el-dropdown-item>
+                  <el-dropdown-item class="my-folder-action-item">
+                    <span class="my-folder-action-item-inner" on-click={ () => this.addFolder(store, data) }>
+                      New Sub Folder
+                    </span>
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </span>
@@ -215,9 +337,21 @@ export default {
                   <i class="el-icon-setting el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item class="my-folder-action-item">New Sub Folder</el-dropdown-item>
-                  <el-dropdown-item class="my-folder-action-item">Rename</el-dropdown-item>
-                  <el-dropdown-item class="my-folder-action-item">Delete Folder</el-dropdown-item>
+                  <el-dropdown-item class="my-folder-action-item">
+                    <span class="my-folder-action-item-inner" on-click={ () => this.addFolder(store, data) }>
+                      New Sub Folder
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item class="my-folder-action-item">
+                    <span class="my-folder-action-item-inner" on-click={ () => this.renameFolder(store, data) }>
+                      Rename
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item class="my-folder-action-item">
+                    <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
+                      Delete Folder
+                    </span>
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </span>
