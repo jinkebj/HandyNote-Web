@@ -1,11 +1,16 @@
 <template>
   <div class="folder-container">
     <el-button class="my-action" @click="addNote">Compose</el-button>
-    <div class="my-recent"><i class="el-icon-date"></i>Recent Notes</div>
-    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" default-expand-all highlight-current
-      :expand-on-click-node="false" :render-content="renderContent" @node-click="selectFolder" :current-node-key="selectedFolderId">
+    <div class="my-recent" :class="selectedFolderId === '' ? 'my-recent-selected' : 'my-recent-unselected'"
+      @click="selectRecent">
+      <i class="el-icon-date"></i>Recent Notes
+    </div>
+    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree"
+      default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
+      @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
-    <div class="my-trash">
+    <div class="my-trash" :class="selectedFolderId === 'mytest-Trash' ? 'my-trash-selected' : 'my-trash-unselected'"
+      @click="selectTrash">
       <i class="el-icon-delete2"></i>
       <span class="my-trash-name">Trash</span>
       <span class="my-trash-action">
@@ -55,8 +60,15 @@
   padding: 10px 15px;
 }
 
-.my-recent:hover,
-.my-trash:hover {
+.my-recent-selected,
+.my-trash-selected {
+  cursor: pointer;
+  background: #20A0FF;
+  color: #FFFFFF;
+}
+
+.my-recent-unselected:hover,
+.my-trash-unselected:hover {
   cursor: pointer;
   background: #E5E9F2;
 }
@@ -90,12 +102,12 @@
 </style>
 
 <style>
-.el-tree--highlight-current .el-tree-node .is-current > .el-tree-node__content {
+.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
   background-color: #20A0FF;
   color: #FFFFFF;
 }
 
-.el-tree--highlight-current .el-tree-node .is-current > .el-tree-node__content .el-icon-setting {
+.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content .el-icon-setting {
   color: #FFFFFF;
 }
 
@@ -131,7 +143,7 @@
   display: inline-flex;
 }
 
-.el-tree--highlight-current .el-tree-node .is-current > .el-tree-node__content .my-folder-action {
+.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content .my-folder-action {
   display: inline-flex;
 }
 
@@ -168,22 +180,29 @@ export default {
         children: 'children',
         label: 'label'
       },
-      selectedFolderId: 'mytest-Root'
+      selectedFolderId: ''
     }
   },
 
   mounted () {
     this.loadFolderList()
+
+    this.$bus.$on('refreshNoteList', (selectedFolderId) => {
+      this.selectedFolderId = selectedFolderId
+    })
   },
 
   methods: {
     addNote () {
       const self = this
+      if (self.selectedFolderId === '') self.selectedFolderId = 'mytest-Root'
+
       Model.addNote({
-        name: 'No Title'
+        name: 'No Title',
+        folder_id: self.selectedFolderId
       })
         .then(function (response) {
-          self.$bus.$emit('refreshNoteList', response.data._id)
+          self.selectAndRefresh(response.data.folder_id, response.data._id)
           self.$message({
             message: 'Add note successfully!',
             type: 'success'
@@ -235,9 +254,9 @@ export default {
           levelMap.set(curLevel, [levelItem])
         }
       })
-      console.log(itemMap)
-      console.log('maxLevel is: ' + maxLevel)
-      console.log(levelMap)
+      // console.log(itemMap)
+      // console.log('maxLevel is: ' + maxLevel)
+      // console.log(levelMap)
 
       for (let i = maxLevel; i > 0; i--) {
         if (!levelMap.has(i)) continue
@@ -248,14 +267,12 @@ export default {
           }
         })
       }
-      console.log(itemMap.get('mytest-Root'))
+      // console.log(itemMap.get('mytest-Root'))
 
       this.noteFolders = [itemMap.get('mytest-Root')]
     },
 
     addFolder (store, data) {
-      console.log('Add folder: ' + JSON.stringify(data))
-
       const self = this
       self.$prompt('Please input folder name', 'New Sub Folder', {
         confirmButtonText: 'Confirm',
@@ -276,6 +293,7 @@ export default {
             })
             store.append({ id: response.data._id, label: response.data.name, ancestor_ids: newAncestorIds, children: [] }, data)
             self.selectedFolderId = response.data._id
+            self.selectAndRefresh(self.selectedFolderId, '')
           })
           .catch(function (error) {
             console.log(error)
@@ -285,8 +303,6 @@ export default {
     },
 
     deleteFolder (store, data) {
-      console.log('Delete folder: ' + JSON.stringify(data))
-
       const self = this
       self.$confirm('You have selected to delete this folder, all related subfolder will be deleted too, this action can NOT be undone, continue?', 'Please Confirm', {
         confirmButtonText: 'Yes',
@@ -301,6 +317,7 @@ export default {
             })
             store.remove(data)
             self.selectedFolderId = data.ancestor_ids[data.ancestor_ids.length - 1]
+            self.selectAndRefresh(self.selectedFolderId, '')
           })
           .catch(function (error) {
             console.log(error)
@@ -310,8 +327,6 @@ export default {
     },
 
     renameFolder (store, data) {
-      console.log('Rename folder: ' + JSON.stringify(data))
-
       const self = this
       self.$prompt('Please input folder name', 'Rename Folder', {
         confirmButtonText: 'Confirm',
@@ -337,7 +352,22 @@ export default {
     },
 
     selectFolder (data) {
-      console.log('Select folder: ' + JSON.stringify(data))
+      this.selectAndRefresh(data.id, '')
+    },
+
+    selectAndRefresh (selectedFolderId, selectedNoteId) {
+      this.selectedFolderId = selectedFolderId
+      this.$bus.$emit('refreshNoteList', selectedFolderId, selectedNoteId)
+    },
+
+    selectRecent () {
+      this.selectAndRefresh('', '')
+      this.$refs.tree.store.setCurrentNode('')
+    },
+
+    selectTrash () {
+      this.selectAndRefresh('mytest-Trash', '')
+      this.$refs.tree.store.setCurrentNode('')
     },
 
     renderContent (h, { node, data, store }) {

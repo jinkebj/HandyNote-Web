@@ -22,12 +22,12 @@
 }
 
 .list-item {
+  cursor: pointer;
   padding: 15px 15px;
   border-bottom: 1px solid #ddd;
 }
 
 .list-item-unselected:hover {
-  cursor: pointer;
   background: #F6F7F9;
 }
 
@@ -64,6 +64,7 @@ export default {
 
   watch: {
     selectedNoteId: function (val, oldVal) {
+      if (val === undefined || val.length === 0 || val === oldVal) return
       this.$bus.$emit('loadNoteWithId', val)
     }
   },
@@ -71,16 +72,20 @@ export default {
   mounted () {
     this.loadNoteList()
 
-    this.$bus.$on('refreshNoteList', (selectId) => {
-      this.selectedNoteId = selectId
-      this.loadNoteList()
+    this.$bus.$on('refreshNoteList', (selectedFolderId, selectedNoteId) => {
+      this.selectedNoteId = selectedNoteId
+      if (selectedFolderId === '') {
+        this.loadNoteList()
+      } else {
+        this.loadNoteList({ folder_id: selectedFolderId })
+      }
     })
   },
 
   methods: {
-    loadNoteList () {
+    loadNoteList (params) {
       const self = this
-      Model.getNoteList()
+      Model.getNoteList(params)
         .then(function (response) {
           self.noteItems = response.data
           if (self.selectedNoteId === '' && self.noteItems.length > 0) self.selectedNoteId = self.noteItems[0]._id

@@ -3,8 +3,8 @@ import {BaseAPIUrl} from '@/../config'
 
 const Model = {}
 
-Model.getNoteList = () => {
-  return http.get(BaseAPIUrl + '/notes')
+Model.getNoteList = (params) => {
+  return http.get(BaseAPIUrl + '/notes', { params: params })
 }
 
 Model.addNote = (params) => {

@@ -92,6 +92,8 @@ export default {
     })
 
     this.$bus.$on('loadNoteWithId', (id) => {
+      if (id === undefined || id.length === 0) return
+
       this.noteId = id
       this.quill.setText('loading...')
       this.loadNote()
@@ -107,7 +109,7 @@ export default {
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
-          self.$bus.$emit('refreshNoteList', response.data._id)
+          self.$bus.$emit('refreshNoteList', response.data.folder_id, response.data._id)
           self.$message({
             message: 'Save note successfully!',
             type: 'success'
@@ -128,7 +130,7 @@ export default {
       }).then(() => {
         Model.deleteNote(self.noteId)
           .then(function (response) {
-            self.$bus.$emit('refreshNoteList', '')
+            self.$bus.$emit('refreshNoteList', response.data.folder_id, '')
             self.$message({
               message: 'Delete note successfully!',
               type: 'success'
