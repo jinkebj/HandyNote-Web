@@ -186,10 +186,6 @@ export default {
 
   mounted () {
     this.loadFolderList()
-
-    this.$bus.$on('refreshNoteList', (selectedFolderId) => {
-      this.selectedFolderId = selectedFolderId
-    })
   },
 
   methods: {

@@ -109,7 +109,7 @@ export default {
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
-          self.$bus.$emit('refreshNoteList', response.data.folder_id, response.data._id)
+          self.$bus.$emit('updateNote', response.data)
           self.$message({
             message: 'Save note successfully!',
             type: 'success'
@@ -130,7 +130,7 @@ export default {
       }).then(() => {
         Model.deleteNote(self.noteId)
           .then(function (response) {
-            self.$bus.$emit('refreshNoteList', response.data.folder_id, '')
+            self.$bus.$emit('deleteNote', response.data._id)
             self.$message({
               message: 'Delete note successfully!',
               type: 'success'

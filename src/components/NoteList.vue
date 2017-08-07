@@ -80,6 +80,35 @@ export default {
         this.loadNoteList({ folder_id: selectedFolderId })
       }
     })
+
+    this.$bus.$on('updateNote', (noteData) => {
+      for (let i = 0; i < this.noteItems.length; i++) {
+        if (this.noteItems[i]._id === noteData._id) {
+          this.noteItems.splice(i, 1)
+          this.noteItems.unshift({
+            _id: noteData._id,
+            name: noteData.name,
+            digest: noteData.digest,
+            updated_at: noteData.updated_at
+          })
+          break
+        }
+      }
+    })
+
+    this.$bus.$on('deleteNote', (noteId) => {
+      for (let i = 0; i < this.noteItems.length; i++) {
+        if (this.noteItems[i]._id === noteId) {
+          this.noteItems.splice(i, 1)
+          break
+        }
+      }
+      if (this.noteItems.length > 0) {
+        this.selectedNoteId = this.noteItems[0]._id
+      } else {
+        this.selectedNoteId = ''
+      }
+    })
   },
 
   methods: {
