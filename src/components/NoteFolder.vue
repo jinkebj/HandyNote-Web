@@ -367,59 +367,59 @@ export default {
     },
 
     renderContent (h, { node, data, store }) {
-      if (data.type === 0) {
-        return (
-          <span class="my-folder-item">
-            <span class="my-folder-name">
-              <span>{node.label}</span>
-            </span>
-            <span class="my-folder-action">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
-                  <i class="el-icon-setting el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item class="my-folder-action-item">
-                    <span class="my-folder-action-item-inner" on-click={ () => this.addFolder(store, data) }>
-                      New Sub Folder
-                    </span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </span>
-          </span>)
-      } else {
-        return (
-          <span class="my-folder-item">
-            <span class="my-folder-name">
-              <span>{node.label}</span>
-            </span>
-            <span class="my-folder-action">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
-                  <i class="el-icon-setting el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item class="my-folder-action-item">
-                    <span class="my-folder-action-item-inner" on-click={ () => this.addFolder(store, data) }>
-                      New Sub Folder
-                    </span>
-                  </el-dropdown-item>
-                  <el-dropdown-item class="my-folder-action-item">
-                    <span class="my-folder-action-item-inner" on-click={ () => this.renameFolder(store, data) }>
-                      Rename
-                    </span>
-                  </el-dropdown-item>
-                  <el-dropdown-item class="my-folder-action-item">
-                    <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
-                      Delete Folder
-                    </span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </span>
-          </span>)
-      }
+      let addFolderAction = (
+        <el-dropdown-item class="my-folder-action-item">
+          <span class="my-folder-action-item-inner" on-click={ () => this.addFolder(store, data) }>
+            New Sub Folder
+          </span>
+        </el-dropdown-item>
+      )
+
+      let renameFolderAction = (
+        <el-dropdown-item class="my-folder-action-item">
+          <span class="my-folder-action-item-inner" on-click={ () => this.renameFolder(store, data) }>
+            Rename
+          </span>
+        </el-dropdown-item>
+      )
+
+      let enableDeleteFolderAction = (
+        <el-dropdown-item class="my-folder-action-item">
+          <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
+            Delete Folder
+          </span>
+        </el-dropdown-item>
+      )
+
+      let disableDeleteFolderAction = (
+        <el-dropdown-item class="my-folder-action-item" disabled>
+          <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
+            Delete Folder
+          </span>
+        </el-dropdown-item>
+      )
+
+      let ret = (
+        <span class="my-folder-item">
+          <span class="my-folder-name">
+            <span>{node.label}</span>
+          </span>
+          <span class="my-folder-action">
+            <el-dropdown trigger="click">
+              <span class="el-dropdown-link">
+                <i class="el-icon-setting el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                { addFolderAction }
+                { data.type === 0 ? '' : renameFolderAction }
+                { data.type === 0 ? '' : (data.children.length > 0 ? disableDeleteFolderAction : enableDeleteFolderAction) }
+              </el-dropdown-menu>
+            </el-dropdown>
+          </span>
+        </span>
+      )
+
+      return ret
     }
 
   }
