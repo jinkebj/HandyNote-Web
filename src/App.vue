@@ -6,9 +6,11 @@
     </div>
 
     <div class="content auto-overflow">
-      <div class="note-folder auto-overflow" v-show="showFolder">
-        <my-note-folder></my-note-folder>
-      </div>
+      <transition name="el-zoom-in-center">
+        <div class="note-folder auto-overflow" v-show="showFolder">
+          <my-note-folder></my-note-folder>
+        </div>
+      </transition>
       <div class="note-list auto-overflow">
         <my-note-list></my-note-list>
       </div>

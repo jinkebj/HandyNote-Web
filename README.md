@@ -1,6 +1,6 @@
 # HandyNote-Web
 
-> HandyNote - Web UI
+> HandyNote - Web App
 
 ## Build Setup
 
@@ -11,7 +11,7 @@ npm config set registry https://registry.npm.taobao.org
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
+# serve with hot reload at localhost:9080
 npm run dev
 
 # build for production with minification
