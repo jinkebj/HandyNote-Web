@@ -1,16 +1,14 @@
 <template>
   <div class="container">
     <div class="header">
-      <el-button type="primary" icon="menu" @click="showFolder = !showFolder"></el-button>
+      <el-button type="primary" icon="menu" @click="toggleNoteFolder"></el-button>
       <my-header></my-header>
     </div>
 
     <div class="content auto-overflow">
-      <transition name="el-zoom-in-center">
-        <div class="note-folder auto-overflow" v-show="showFolder">
-          <my-note-folder></my-note-folder>
-        </div>
-      </transition>
+      <div class="note-folder auto-overflow">
+        <my-note-folder></my-note-folder>
+      </div>
       <div class="note-list auto-overflow">
         <my-note-list></my-note-list>
       </div>
@@ -30,6 +28,18 @@ html, body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+.gutter.gutter-horizontal {
+  background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}
 </style>
 
 <style scoped>
@@ -40,9 +50,9 @@ html, body {
   display: flex;
   flex-flow: column;
 
-  justify-content: flex-start; /* align items in Main Axis */
-  align-items: stretch; /* align items in Cross Axis */
-  align-content: stretch; /* Extra space in Cross Axis */
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
 }
 
 .header {
@@ -61,35 +71,26 @@ html, body {
   display: flex;
   flex-flow: row;
 
-  justify-content: flex-start; /* align items in Main Axis */
-  align-items: stretch; /* align items in Cross Axis */
-  align-content: stretch; /* Extra space in Cross Axis */
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
 }
 
 .note-folder {
-  flex: 3;
   background: #F5F5F5;
-}
-
-.note-list {
-  flex: 4;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-}
-
-.note-detail {
-  flex: 17;
 }
 
 .auto-overflow {
   overflow: auto; /* Needed for when the area gets squished too far and there is content that can't be displayed */
 }
+
 .hide-overflow {
   overflow: hidden;
 }
 </style>
 
 <script>
+import Split from 'split.js'
 import MyHeader from '@/components/Header'
 import MyNoteFolder from '@/components/NoteFolder'
 import MyNoteList from '@/components/NoteList'
@@ -107,7 +108,54 @@ export default {
 
   data () {
     return {
-      showFolder: true
+      split: {}
+    }
+  },
+
+  mounted () {
+    let self = this
+
+    this.split = Split(['.note-folder', '.note-list', '.note-detail'], {
+      sizes: self.getPaneSize(),
+      minSize: [150, 200, 400],
+      gutterSize: 6,
+      elementStyle: function (dimension, size, gutterSize) {
+        return {
+          'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)'
+        }
+      },
+      gutterStyle: function (dimension, gutterSize) {
+        return {
+          'flex-basis': gutterSize + 'px'
+        }
+      },
+      onDragEnd: function () {
+        window.localStorage.setItem('hn-pane-sizes', JSON.stringify(self.split.getSizes()))
+      }
+    })
+  },
+
+  methods: {
+    getPaneSize () {
+      let sizes = window.localStorage.getItem('hn-pane-sizes')
+      if (sizes) {
+        sizes = JSON.parse(sizes)
+      } else {
+        sizes = [12, 16, 72]  // default pane size
+      }
+
+      return sizes
+    },
+
+    toggleNoteFolder () {
+      let sizes = this.split.getSizes()
+      if (sizes[0] < 1) {
+        this.split.setSizes(this.getPaneSize())
+      } else {
+        this.split.collapse(0)
+      }
+
+      console.log(this.split.getSizes())
     }
   }
 }
