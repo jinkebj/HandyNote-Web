@@ -5,14 +5,14 @@
       <my-header></my-header>
     </div>
 
-    <div class="content auto-overflow">
-      <div class="note-folder auto-overflow">
+    <div class="content">
+      <div class="note-folder">
         <my-note-folder></my-note-folder>
       </div>
-      <div class="note-list auto-overflow">
+      <div class="note-list">
         <my-note-list></my-note-list>
       </div>
-      <div class="note-detail hide-overflow">
+      <div class="note-detail">
         <!-- <router-view></router-view> -->
         <my-note-detail></my-note-detail>
       </div>
@@ -35,6 +35,10 @@ html, body {
   background-position: 50%;
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
+}
+
+.gutter:hover {
+  cursor: col-resize;
 }
 
 .gutter.gutter-horizontal {
@@ -67,6 +71,7 @@ html, body {
 
 .content {
   flex: 1; /* same as flex: 1 1 auto; */
+  overflow: auto; /* Needed for when the area gets squished too far and there is content that can't be displayed */
 
   display: flex;
   flex-flow: row;
@@ -78,13 +83,19 @@ html, body {
 
 .note-folder {
   background: #F5F5F5;
+  overflow: hidden;
 }
 
-.auto-overflow {
-  overflow: auto; /* Needed for when the area gets squished too far and there is content that can't be displayed */
+.note-list {
+  overflow: hidden;
 }
 
-.hide-overflow {
+.note-list:hover,
+.note-folder:hover {
+  overflow: auto;
+}
+
+.note-detail {
   overflow: hidden;
 }
 </style>
