@@ -88,7 +88,7 @@
 </style>
 
 <style>
-.ql-toolbar.ql-snow {
+.note-container .ql-toolbar.ql-snow {
   border-left: none;
   border-right: none;
 }

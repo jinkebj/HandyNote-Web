@@ -1,7 +1,8 @@
 import http from 'axios'
-import {BaseAPIUrl} from '@/../config'
+import {HANDYNOTE_SERVICE_API} from '@/../config'
 
 const Model = {}
+const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || HANDYNOTE_SERVICE_API
 
 Model.getNoteList = (params) => {
   return http.get(BaseAPIUrl + '/notes', { params: params })

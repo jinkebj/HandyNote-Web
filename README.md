@@ -11,6 +11,11 @@ npm config set registry https://registry.npm.taobao.org
 # install dependencies
 npm install
 
+# Optional, set HANDYNOTE_WEB_PORT & HANDYNOTE_SERVICE_API
+# if not set, will use HANDYNOTE_WEB_PORT=9080, HANDYNOTE_SERVICE_API=http://localhost:3000/api
+export HANDYNOTE_WEB_PORT={portnum}
+export HANDYNOTE_SERVICE_API=http://IP:Port/api
+
 # serve with hot reload at localhost:9080
 npm run dev
 

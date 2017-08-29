@@ -165,8 +165,6 @@ export default {
       } else {
         this.split.collapse(0)
       }
-
-      console.log(this.split.getSizes())
     }
   }
 }
