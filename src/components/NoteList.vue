@@ -11,6 +11,9 @@
         </div>
       </a>
     </div>
+    <div class="list-empty-hint" v-show="noteItems.length === 0">
+      This folder has no notes
+    </div>
   </div>
 </template>
 
@@ -48,6 +51,12 @@
   font-size: 80%;
   margin: 5px 0;
 }
+
+.list-empty-hint {
+  padding: 400px 50px 400px 50px;
+  color: #999;
+  font-size: 20px;
+}
 </style>
 
 <script>
@@ -63,7 +72,7 @@ export default {
 
   watch: {
     selectedNoteId: function (val, oldVal) {
-      if (val === undefined || val.length === 0 || val === oldVal) return
+      if (val === oldVal) return
       this.$bus.$emit('loadNoteWithId', val)
     }
   },

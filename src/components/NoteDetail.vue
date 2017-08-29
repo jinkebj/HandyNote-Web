@@ -1,41 +1,47 @@
 <template>
-  <div class="note-container">
-    <div class="note-header">
-      <input type="text" class="note-title" v-model="noteName">
-
-      <el-popover
-        ref="noteMetaData"
-        placement="bottom"
-        title="Note Information"
-        width="200"
-        trigger="click"
-        content="This is the detail information of note.">
-      </el-popover>
-
-      <div class="note-controls">
-        <el-button @click="updateNote">Save</el-button>
-
-        <el-button-group class="note-controls-icon-group">
-          <el-tooltip content="Note Infomation" placement="top" effect="light">
-            <el-button icon="information" class="note-controls-icon" v-popover:noteMetaData></el-button>
-          </el-tooltip>
-          <el-tooltip content="Delete" placement="top" effect="light">
-            <el-button icon="delete" class="note-controls-icon" @click="deleteNote"></el-button>
-          </el-tooltip>
-        </el-button-group>
-
-        <el-dropdown trigger="click">
-          <el-tooltip content="More Action" placement="top" effect="light">
-            <el-button icon="more" class="note-controls-icon"></el-button>
-          </el-tooltip>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item><span class="note-controls-text">Move To</span></el-dropdown-item>
-            <el-dropdown-item><span class="note-controls-text">Export</span></el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
+  <div>
+    <div class="note-empty-hint" v-show="noteId === ''">
+      <i class="el-icon-document"></i> No content
     </div>
-    <div id="note-editor"></div>
+
+    <div class="note-container" v-show="noteId !== ''">
+      <div class="note-header">
+        <input type="text" class="note-title" v-model="noteName">
+
+        <el-popover
+          ref="noteMetaData"
+          placement="bottom"
+          title="Note Information"
+          width="200"
+          trigger="click"
+          content="This is the detail information of note.">
+        </el-popover>
+
+        <div class="note-controls">
+          <el-button @click="updateNote">Save</el-button>
+
+          <el-button-group class="note-controls-icon-group">
+            <el-tooltip content="Note Infomation" placement="top" effect="light">
+              <el-button icon="information" class="note-controls-icon" v-popover:noteMetaData></el-button>
+            </el-tooltip>
+            <el-tooltip content="Delete" placement="top" effect="light">
+              <el-button icon="delete" class="note-controls-icon" @click="deleteNote"></el-button>
+            </el-tooltip>
+          </el-button-group>
+
+          <el-dropdown trigger="click">
+            <el-tooltip content="More Action" placement="top" effect="light">
+              <el-button icon="more" class="note-controls-icon"></el-button>
+            </el-tooltip>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item><span class="note-controls-text">Move To</span></el-dropdown-item>
+              <el-dropdown-item><span class="note-controls-text">Export</span></el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+      </div>
+      <div id="note-editor"></div>
+    </div>
   </div>
 </template>
 
@@ -85,6 +91,12 @@
   border: 0;
   font-size: 16px;
 }
+
+.note-empty-hint {
+  padding: 400px 400px 400px 400px;
+  color: #999;
+  font-size: 20px;
+}
 </style>
 
 <style>
@@ -132,7 +144,10 @@ export default {
     })
 
     this.$bus.$on('loadNoteWithId', (id) => {
-      if (id === undefined || id.length === 0) return
+      if (id === undefined || id.length === 0) {
+        this.noteId = ''
+        return
+      }
 
       this.noteId = id
       this.quill.setText('loading...')
