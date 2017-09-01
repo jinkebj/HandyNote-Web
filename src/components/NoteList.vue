@@ -1,5 +1,8 @@
 <template>
   <div class="list-content">
+    <div class="list-count" v-show="noteItems.length > 0">
+      Count: {{noteItems.length}}
+    </div>
     <div v-for="noteItem in noteItems">
       <a @click="selectedNoteId = noteItem._id">
         <div class="list-item" :class="selectedNoteId === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
@@ -22,6 +25,13 @@
   text-decoration: none;
   outline: none;
   color: #434343;
+}
+
+.list-count {
+  font-size: 14px;
+  padding: 15px 15px;
+  border-bottom: 1px solid #ddd;
+  background: #F5F5F5;
 }
 
 .list-item {

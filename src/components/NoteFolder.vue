@@ -300,7 +300,7 @@ export default {
 
     deleteFolder (store, data) {
       const self = this
-      self.$confirm('You have selected to delete this folder, all related subfolder will be deleted too, this action can NOT be undone, continue?', 'Please Confirm', {
+      self.$confirm('All notes and subfolder under this folder will be moved to trash, continue?', 'Please Confirm', {
         confirmButtonText: 'Yes',
         cancelButtonText: 'No',
         type: 'warning'
@@ -308,7 +308,7 @@ export default {
         Model.deleteFolder(data.id)
           .then(function (response) {
             self.$message({
-              message: 'Delete folder successfully!',
+              message: 'Move folder to trash successfully!',
               type: 'success'
             })
             store.remove(data)
@@ -317,7 +317,7 @@ export default {
           })
           .catch(function (error) {
             console.log(error)
-            self.$message.error('Delete folder failed!')
+            self.$message.error('Move folder to trash failed!')
           })
       })
     },
