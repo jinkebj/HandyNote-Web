@@ -53,7 +53,10 @@
 }
 
 .list-empty-hint {
-  padding: 400px 50px 400px 50px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #999;
   font-size: 20px;
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="note-empty-hint" v-show="noteId === ''">
-      <i class="el-icon-document"></i> No content
+      <i class="el-icon-document"></i>&nbsp;&nbsp;No content
     </div>
 
     <div class="note-container" v-show="noteId !== ''">
@@ -93,7 +93,10 @@
 }
 
 .note-empty-hint {
-  padding: 400px 400px 400px 400px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #999;
   font-size: 20px;
 }
