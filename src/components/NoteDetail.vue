@@ -181,7 +181,7 @@ export default {
 
     deleteNote () {
       const self = this
-      self.$confirm('You have selected to delete this note, continue?', 'Please Confirm', {
+      self.$confirm('Move this note to trash?', 'Please Confirm', {
         confirmButtonText: 'Yes',
         cancelButtonText: 'No',
         type: 'warning'
@@ -190,13 +190,13 @@ export default {
           .then(function (response) {
             self.$bus.$emit('deleteNote', response.data._id)
             self.$message({
-              message: 'Delete note successfully!',
+              message: 'Move note to trash successfully!',
               type: 'success'
             })
           })
           .catch(function (error) {
             console.log(error)
-            self.$message.error('Delete note failed!')
+            self.$message.error('Move note to trash failed!')
           })
       })
     },

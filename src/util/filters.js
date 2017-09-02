@@ -1,7 +1,11 @@
 import format from 'date-fns/format'
 
-export const fmtTime = (time) => {
+export const fmtDateTime = (time) => {
   return format(time, 'YYYY-MM-DD HH:mm')
+}
+
+export const fmtDate = (time) => {
+  return format(time, 'YYYY-MM-DD')
 }
 
 export const truncate = (str, size) => {

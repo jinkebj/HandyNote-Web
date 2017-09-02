@@ -1,21 +1,25 @@
 <template>
   <div class="list-content">
-    <div class="list-count" v-show="noteItems.length > 0">
-      Count: {{noteItems.length}}
+    <div class="list-count" v-show="listItems.length > 0">
+      Count: {{listItems.length}}
     </div>
-    <div v-for="noteItem in noteItems">
-      <a @click="selectedNoteId = noteItem._id">
-        <div class="list-item" :class="selectedNoteId === noteItem._id ? 'list-item-selected' : 'list-item-unselected'">
-          <h4 class="list-item-subject">{{noteItem.name | truncate(50)}}</h4>
-          <p class="list-item-desc">
-            {{noteItem.digest | truncate(100)}}
-          </p>
-          <h5 class="list-item-time">{{noteItem.updated_at | fmtTime}}</h5>
-        </div>
-      </a>
+    <div v-for="listItem in listItems">
+      <div class="list-item" @click="selectItem(listItem)"
+        :class="selectedItemId === listItem._id ? 'list-item-selected' : 'list-item-unselected'">
+        <h4 class="list-item-subject">
+          <i class="list-item-subject-icon el-icon-message" v-if="listItem.folder_name === undefined"></i>
+          <span class="list-item-subject-title">{{listItem.name | truncate(50)}}</span>
+          <i class="list-item-subject-action list-item-margin el-icon-check" v-if="listItem.deleted === 1"></i>
+          <i class="list-item-subject-action el-icon-delete2" @click="deleteItem(listItem)"></i>
+        </h4>
+        <p class="list-item-desc">
+          {{listItem.digest | truncate(100)}}
+        </p>
+        <h5 class="list-item-time">{{listItem.updated_at | fmtDate}} {{listItem.folder_name}}</h5>
+      </div>
     </div>
-    <div class="list-empty-hint" v-show="noteItems.length === 0">
-      This folder has no notes
+    <div class="list-empty-hint" v-show="listItems.length === 0">
+      No notes
     </div>
   </div>
 </template>
@@ -57,9 +61,36 @@
   color: #999;
 }
 
+.list-item-subject {
+  display: flex;
+  flex-flow: row;
+}
+
+.list-item-margin,
+.list-item-subject-icon {
+  margin-right: 10px;
+}
+
+.list-item-subject-title {
+  flex: auto;
+}
+
+.list-item-subject-action {
+  display: none;
+}
+
+.list-item:hover .list-item-subject-action {
+  display: inline-flex;
+}
+
+.el-icon-check:hover,
+.el-icon-delete2:hover {
+  color: #20A0FF;
+}
+
 .list-item-desc {
   font-size: 80%;
-  margin: 5px 0;
+  margin: 10px 0;
 }
 
 .list-empty-hint {
@@ -78,15 +109,20 @@ import Model from '@/models'
 export default {
   data () {
     return {
-      noteItems: [],
-      selectedNoteId: ''
+      listItems: [],
+      selectedItemId: '',
+      selectedItemType: 0 // 0: note, 1: folder
     }
   },
 
   watch: {
-    selectedNoteId: function (val, oldVal) {
+    selectedItemId: function (val, oldVal) {
       if (val === oldVal) return
-      this.$bus.$emit('loadNoteWithId', val)
+      if (this.selectedItemType === 0) {
+        this.$bus.$emit('loadNoteWithId', val)
+      } else {
+        this.$bus.$emit('loadNoteWithId', '')
+      }
     }
   },
 
@@ -94,22 +130,25 @@ export default {
     this.loadNoteList()
 
     this.$bus.$on('refreshNoteList', (selectedFolderId, selectedNoteId) => {
-      this.selectedNoteId = selectedNoteId
-      if (selectedFolderId === '') {
+      this.selectedItemId = selectedNoteId
+      if (selectedFolderId === 'mytest-Recent') {
         this.loadNoteList()
+      } else if (selectedFolderId === 'mytest-Trash') {
+        this.loadTrash()
       } else {
         this.loadNoteList({ folder_id: selectedFolderId })
       }
     })
 
     this.$bus.$on('updateNote', (noteData) => {
-      for (let i = 0; i < this.noteItems.length; i++) {
-        if (this.noteItems[i]._id === noteData._id) {
-          this.noteItems.splice(i, 1)
-          this.noteItems.unshift({
+      for (let i = 0; i < this.listItems.length; i++) {
+        if (this.listItems[i]._id === noteData._id) {
+          this.listItems.splice(i, 1)
+          this.listItems.unshift({
             _id: noteData._id,
             name: noteData.name,
             digest: noteData.digest,
+            folder_name: noteData.folder_name,
             updated_at: noteData.updated_at
           })
           break
@@ -118,32 +157,98 @@ export default {
     })
 
     this.$bus.$on('deleteNote', (noteId) => {
-      for (let i = 0; i < this.noteItems.length; i++) {
-        if (this.noteItems[i]._id === noteId) {
-          this.noteItems.splice(i, 1)
+      for (let i = 0; i < this.listItems.length; i++) {
+        if (this.listItems[i]._id === noteId) {
+          this.listItems.splice(i, 1)
           break
         }
       }
-      if (this.noteItems.length > 0) {
-        this.selectedNoteId = this.noteItems[0]._id
+      if (this.listItems.length > 0) {
+        this.selectItem(this.listItems[0])
       } else {
-        this.selectedNoteId = ''
+        this.selectedItemId = ''
       }
     })
   },
 
   methods: {
+    selectItem (listItem) {
+      this.selectedItemId = listItem._id
+      this.selectedItemType = (listItem.folder_name === undefined ? 1 : 0)
+    },
+
     loadNoteList (params) {
       const self = this
       Model.getNoteList(params)
         .then(function (response) {
-          self.noteItems = response.data
-          if (self.selectedNoteId === '' && self.noteItems.length > 0) self.selectedNoteId = self.noteItems[0]._id
+          self.listItems = response.data
+          if (self.selectedItemId === '' && self.listItems.length > 0) {
+            self.selectItem(self.listItems[0])
+          }
         })
         .catch(function (error) {
           console.log(error)
           self.$message.error('Failed to load note list!')
         })
+    },
+
+    loadTrash () {
+      const self = this
+      Model.getTrash()
+        .then(function (response) {
+          self.listItems = response.data
+          self.selectedItemId === ''
+          if (self.selectedItemId === '' && self.listItems.length > 0) {
+            self.selectItem(self.listItems[0])
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Failed to load trash list!')
+        })
+    },
+
+    deleteItem (listItem) {
+      const self = this
+      if (listItem.deleted === 0) {
+        self.$confirm('Move this note to trash?', 'Please Confirm', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          Model.deleteNote(listItem._id)
+            .then(function (response) {
+              self.$bus.$emit('deleteNote', response.data._id)
+              self.$message({
+                message: 'Move note to trash successfully!',
+                type: 'success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error)
+              self.$message.error('Move note to trash failed!')
+            })
+        })
+      } else {
+        self.$confirm('Permanently delete this item? This action can NOT be undone!', 'Please Confirm', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          Model.deleteTrash(listItem._id)
+            .then(function (response) {
+              self.$bus.$emit('deleteNote', response.data._id)
+              self.$message({
+                message: 'Permanently delete item successfully!',
+                type: 'success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error)
+              self.$message.error('Delete item failed!')
+            })
+        })
+      }
     }
   }
 }

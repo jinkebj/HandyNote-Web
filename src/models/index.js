@@ -40,4 +40,12 @@ Model.deleteFolder = (id) => {
   return http.delete(BaseAPIUrl + '/folders/' + id)
 }
 
+Model.getTrash = () => {
+  return http.get(BaseAPIUrl + '/trash')
+}
+
+Model.deleteTrash = (id) => {
+  return http.delete(BaseAPIUrl + '/trash/' + id)
+}
+
 export default Model

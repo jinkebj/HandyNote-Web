@@ -1,7 +1,7 @@
 <template>
   <div class="folder-container">
     <el-button class="my-action" @click="addNote">Compose</el-button>
-    <div class="my-recent" :class="selectedFolderId === '' ? 'my-recent-selected' : 'my-recent-unselected'"
+    <div class="my-recent" :class="selectedFolderId === 'mytest-Recent' ? 'my-recent-selected' : 'my-recent-unselected'"
       @click="selectRecent">
       <i class="el-icon-date"></i>Recent Notes
     </div>
@@ -64,6 +64,10 @@
 .my-trash-selected {
   cursor: pointer;
   background: #20A0FF;
+  color: #FFFFFF;
+}
+
+.my-trash-selected .el-icon-setting {
   color: #FFFFFF;
 }
 
@@ -180,7 +184,7 @@ export default {
         children: 'children',
         label: 'label'
       },
-      selectedFolderId: ''
+      selectedFolderId: 'mytest-Recent'
     }
   },
 
@@ -191,7 +195,9 @@ export default {
   methods: {
     addNote () {
       const self = this
-      if (self.selectedFolderId === '') self.selectedFolderId = 'mytest-Root'
+      if (self.selectedFolderId === 'mytest-Recent' || self.selectedFolderId === 'mytest-Trash') {
+        self.selectedFolderId = 'mytest-Root'
+      }
 
       Model.addNote({
         name: 'No Title',
@@ -339,6 +345,7 @@ export default {
               type: 'success'
             })
             store.getNode(data).data.label = value
+            self.selectAndRefresh(self.selectedFolderId, '')
           })
           .catch(function (error) {
             console.log(error)
@@ -357,7 +364,7 @@ export default {
     },
 
     selectRecent () {
-      this.selectAndRefresh('', '')
+      this.selectAndRefresh('mytest-Recent', '')
       this.$refs.tree.store.setCurrentNode('')
     },
 
@@ -383,16 +390,8 @@ export default {
         </el-dropdown-item>
       )
 
-      let enableDeleteFolderAction = (
+      let deleteFolderAction = (
         <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
-            Delete Folder
-          </span>
-        </el-dropdown-item>
-      )
-
-      let disableDeleteFolderAction = (
-        <el-dropdown-item class="my-folder-action-item" disabled>
           <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
             Delete Folder
           </span>
@@ -412,7 +411,7 @@ export default {
               <el-dropdown-menu slot="dropdown">
                 { addFolderAction }
                 { data.type === 0 ? '' : renameFolderAction }
-                { data.type === 0 ? '' : (data.children.length > 0 ? disableDeleteFolderAction : enableDeleteFolderAction) }
+                { data.type === 0 ? '' : deleteFolderAction }
               </el-dropdown-menu>
             </el-dropdown>
           </span>

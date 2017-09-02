@@ -34,16 +34,16 @@ html, body {
   background-repeat: no-repeat;
   background-position: 50%;
   border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+  /*border-right: 1px solid #ddd;*/
 }
 
 .gutter:hover {
   cursor: col-resize;
 }
 
-.gutter.gutter-horizontal {
+/*.gutter.gutter-horizontal {
   background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-}
+}*/
 </style>
 
 <style scoped>
@@ -129,7 +129,7 @@ export default {
     this.split = Split(['.note-folder', '.note-list', '.note-detail'], {
       sizes: self.getPaneSize(),
       minSize: [150, 200, 400],
-      gutterSize: 6,
+      gutterSize: 0,
       elementStyle: function (dimension, size, gutterSize) {
         return {
           'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)'
