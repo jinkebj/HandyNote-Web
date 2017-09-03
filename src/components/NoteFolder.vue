@@ -20,7 +20,7 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item class="my-folder-action-item">
-              <span class="my-folder-action-item-inner">
+              <span class="my-folder-action-item-inner" @click="emptyTrash">
                 Empty Trash
               </span>
             </el-dropdown-item>
@@ -371,6 +371,28 @@ export default {
     selectTrash () {
       this.selectAndRefresh('mytest-Trash', '')
       this.$refs.tree.store.setCurrentNode('')
+    },
+
+    emptyTrash () {
+      const self = this
+      self.$confirm('Permanently delete all items in trash? This action can NOT be undone!', 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        Model.emptyTrash()
+          .then(function (response) {
+            self.$message({
+              message: 'Empty trash successfully!',
+              type: 'success'
+            })
+            self.selectAndRefresh(self.selectedFolderId, '')
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Empty trash failed!')
+          })
+      })
     },
 
     renderContent (h, { node, data, store }) {

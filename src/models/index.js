@@ -44,8 +44,16 @@ Model.getTrash = () => {
   return http.get(BaseAPIUrl + '/trash')
 }
 
+Model.emptyTrash = () => {
+  return http.post(BaseAPIUrl + '/trash/empty')
+}
+
 Model.deleteTrash = (id) => {
   return http.delete(BaseAPIUrl + '/trash/' + id)
+}
+
+Model.restoreTrash = (id) => {
+  return http.post(BaseAPIUrl + '/trash/' + id + '/restore')
 }
 
 export default Model

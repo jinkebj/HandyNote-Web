@@ -9,7 +9,8 @@
         <h4 class="list-item-subject">
           <i class="list-item-subject-icon el-icon-message" v-if="listItem.folder_name === undefined"></i>
           <span class="list-item-subject-title">{{listItem.name | truncate(50)}}</span>
-          <i class="list-item-subject-action list-item-margin el-icon-check" v-if="listItem.deleted === 1"></i>
+          <i class="list-item-subject-action list-item-margin el-icon-check"
+            v-if="listItem.deleted === 1" @click="restoreItem(listItem._id)"></i>
           <i class="list-item-subject-action el-icon-delete2" @click="deleteItem(listItem)"></i>
         </h4>
         <p class="list-item-desc">
@@ -249,6 +250,26 @@ export default {
             })
         })
       }
+    },
+
+    restoreItem (itemId) {
+      const self = this
+      Model.restoreTrash(itemId)
+        .then(function (response) {
+          let showMessage = 'Restore item successfully!'
+          if (response.data.toRootFolderFlag) {
+            showMessage = 'As folder of this item has been deleted, restore item to root folder!'
+          }
+          self.$bus.$emit('deleteNote', response.data._id)
+          self.$message({
+            message: showMessage,
+            type: 'success'
+          })
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Restore item failed!')
+        })
     }
   }
 }
