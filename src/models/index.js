@@ -24,8 +24,8 @@ Model.deleteNote = (id) => {
   return http.delete(BaseAPIUrl + '/notes/' + id)
 }
 
-Model.getFolderList = () => {
-  return http.get(BaseAPIUrl + '/folders')
+Model.getFolderList = (params) => {
+  return http.get(BaseAPIUrl + '/folders', { params: params })
 }
 
 Model.addFolder = (params) => {

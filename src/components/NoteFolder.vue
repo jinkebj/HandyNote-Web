@@ -1,14 +1,17 @@
 <template>
   <div class="folder-container">
     <el-button class="my-action" @click="addNote">Compose</el-button>
+
     <div class="my-recent" :class="selectedFolderId === 'mytest-Recent' ? 'my-recent-selected' : 'my-recent-unselected'"
       @click="selectRecent">
       <i class="el-icon-date"></i>Recent Notes
     </div>
+
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
       @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
+
     <div class="my-trash" :class="selectedFolderId === 'mytest-Trash' ? 'my-trash-selected' : 'my-trash-unselected'"
       @click="selectTrash">
       <i class="el-icon-delete2"></i>
@@ -33,6 +36,17 @@
         </el-dropdown>
       </span>
     </div>
+
+    <el-dialog title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
+      <el-tree :data="moveToFolders" default-expand-all highlight-current :expand-on-click-node="false"
+        @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
+      </el-tree>
+      Move to folder: {{selectedMoveToFolderId}}
+      <div slot="footer">
+        <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
+        <el-button type="primary" @click="showMoveToFolderForm = false">Confirm</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -167,6 +181,7 @@
 
 <script>
 import Model from '@/models'
+import {prepareFolderData} from '@/util'
 
 export default {
   data () {
@@ -184,6 +199,9 @@ export default {
         children: 'children',
         label: 'label'
       },
+      moveToFolders: [],
+      showMoveToFolderForm: false,
+      selectedMoveToFolderId: '',
       selectedFolderId: 'mytest-Recent'
     }
   },
@@ -225,58 +243,12 @@ export default {
       const self = this
       Model.getFolderList()
         .then(function (response) {
-          self.prepareFolderData(response.data)
+          self.noteFolders = prepareFolderData(self.noteFolders[0], response.data)
         })
         .catch(function (error) {
           console.log(error)
           self.$message.error('Failed to load folder list!')
         })
-    },
-
-    prepareFolderData (inputData) {
-      if (inputData.length === 0) return
-
-      let rootItem = this.noteFolders[0]
-      rootItem.children = []
-
-      let itemMap = new Map()
-      itemMap.set('mytest-Root', rootItem)
-
-      let maxLevel = 0
-      let levelMap = new Map()
-
-      inputData.forEach(item => {
-        const curLevel = item.ancestor_ids.length
-        maxLevel = Math.max(curLevel, maxLevel)
-        itemMap.set(item._id, {
-          id: item._id,
-          label: item.name,
-          ancestor_ids: item.ancestor_ids,
-          children: []
-        })
-        let levelItem = {itemId: item._id, parentId: item.parent_id}
-        if (levelMap.has(curLevel)) {
-          levelMap.get(curLevel).push(levelItem)
-        } else {
-          levelMap.set(curLevel, [levelItem])
-        }
-      })
-      // console.log(itemMap)
-      // console.log('maxLevel is: ' + maxLevel)
-      // console.log(levelMap)
-
-      for (let i = maxLevel; i > 0; i--) {
-        if (!levelMap.has(i)) continue
-        let levelItems = levelMap.get(i)
-        levelItems.forEach(item => {
-          if (itemMap.has(item.parentId) && itemMap.has(item.itemId)) {
-            itemMap.get(item.parentId).children.push(itemMap.get(item.itemId))
-          }
-        })
-      }
-      // console.log(itemMap.get('mytest-Root'))
-
-      this.noteFolders = [itemMap.get('mytest-Root')]
     },
 
     addFolder (store, data) {
@@ -333,6 +305,11 @@ export default {
       })
     },
 
+    showMoveFolder (store, data) {
+      this.moveToFolders = this.noteFolders
+      this.showMoveToFolderForm = true
+    },
+
     renameFolder (store, data) {
       const self = this
       self.$prompt('Please input folder name', 'Rename Folder', {
@@ -361,6 +338,10 @@ export default {
 
     selectFolder (data) {
       if (this.selectedFolderId !== data.id) this.selectAndRefresh(data.id, '')
+    },
+
+    selectMoveToFolder (data) {
+      this.selectedMoveToFolderId = data.id
     },
 
     selectAndRefresh (selectedFolderId, selectedNoteId) {
@@ -440,6 +421,14 @@ export default {
         </el-dropdown-item>
       )
 
+      let moveFolderAction = (
+        <el-dropdown-item class="my-folder-action-item">
+          <span class="my-folder-action-item-inner" on-click={ () => this.showMoveFolder(store, data) }>
+            Move To
+          </span>
+        </el-dropdown-item>
+      )
+
       let deleteFolderAction = (
         <el-dropdown-item class="my-folder-action-item">
           <span class="my-folder-action-item-inner" on-click={ () => this.deleteFolder(store, data) }>
@@ -461,6 +450,7 @@ export default {
               <el-dropdown-menu slot="dropdown">
                 { addFolderAction }
                 { data.type === 0 ? '' : renameFolderAction }
+                { data.type === 0 ? '' : moveFolderAction }
                 { data.type === 0 ? '' : deleteFolderAction }
               </el-dropdown-menu>
             </el-dropdown>
