@@ -37,14 +37,16 @@
       </span>
     </div>
 
-    <el-dialog title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
+    <el-dialog class="my-folder-form" title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
       <el-tree :data="moveToFolders" default-expand-all highlight-current :expand-on-click-node="false"
         @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
       </el-tree>
-      Move to folder: {{selectedMoveToFolderId}}
       <div slot="footer">
         <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
-        <el-button type="primary" @click="showMoveToFolderForm = false">Confirm</el-button>
+        <el-button type="primary" @click="moveFolder"
+          :disabled="selectedMoveToFolderId === ''">
+          Confirm
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -177,6 +179,10 @@
   flex: 1;
   padding: 0px 10px;
 }
+
+.my-folder-form .el-dialog__body {
+  padding: 20px 20px 10px 20px;
+}
 </style>
 
 <script>
@@ -306,8 +312,35 @@ export default {
     },
 
     showMoveFolder (store, data) {
-      this.moveToFolders = this.noteFolders
+      const self = this
+      self.selectedMoveToFolderId = ''
+      Model.getFolderList({exclude_id: data.id})
+        .then(function (response) {
+          self.moveToFolders = prepareFolderData(self.noteFolders[0], response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
       this.showMoveToFolderForm = true
+    },
+
+    moveFolder () {
+      const self = this
+      Model.updateFolder(self.selectedFolderId, {
+        parent_id: self.selectedMoveToFolderId
+      })
+        .then(function (response) {
+          self.$message({
+            message: 'Move folder successfully!',
+            type: 'success'
+          })
+          self.showMoveToFolderForm = false
+          self.loadFolderList()
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Move folder failed!')
+        })
     },
 
     renameFolder (store, data) {
