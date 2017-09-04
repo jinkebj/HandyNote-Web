@@ -360,7 +360,7 @@ export default {
     },
 
     selectFolder (data) {
-      this.selectAndRefresh(data.id, '')
+      if (this.selectedFolderId !== data.id) this.selectAndRefresh(data.id, '')
     },
 
     selectAndRefresh (selectedFolderId, selectedNoteId) {

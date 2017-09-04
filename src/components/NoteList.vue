@@ -95,7 +95,7 @@
 }
 
 .list-empty-hint {
-  height: 100vh;
+  height: calc(100vh - 160px);
   display: flex;
   justify-content: center;
   align-items: center;
