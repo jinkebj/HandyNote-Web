@@ -256,13 +256,9 @@ export default {
       const self = this
       Model.restoreTrash(itemId)
         .then(function (response) {
-          let showMessage = 'Restore item successfully!'
-          if (response.data.toRootFolderFlag) {
-            showMessage = 'As folder of this item has been deleted, restore item to root folder!'
-          }
           self.$bus.$emit('deleteNote', response.data._id)
           self.$message({
-            message: showMessage,
+            message: 'Restore item successfully!',
             type: 'success'
           })
         })
