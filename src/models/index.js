@@ -48,6 +48,10 @@ Model.emptyTrash = () => {
   return http.post(BaseAPIUrl + '/trash/empty')
 }
 
+Model.revertTrash = () => {
+  return http.post(BaseAPIUrl + '/trash/revert')
+}
+
 Model.deleteTrash = (id) => {
   return http.delete(BaseAPIUrl + '/trash/' + id)
 }

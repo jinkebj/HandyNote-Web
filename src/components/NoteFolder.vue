@@ -25,7 +25,7 @@
               </span>
             </el-dropdown-item>
             <el-dropdown-item class="my-folder-action-item">
-              <span class="my-folder-action-item-inner">
+              <span class="my-folder-action-item-inner" @click="revertTrash">
                 Restore All
               </span>
             </el-dropdown-item>
@@ -190,6 +190,11 @@ export default {
 
   mounted () {
     this.loadFolderList()
+
+    this.$bus.$on('refreshFolderList', (selectedFolderId) => {
+      this.selectedFolderId = selectedFolderId
+      this.loadFolderList()
+    })
   },
 
   methods: {
@@ -391,6 +396,29 @@ export default {
           .catch(function (error) {
             console.log(error)
             self.$message.error('Empty trash failed!')
+          })
+      })
+    },
+
+    revertTrash () {
+      const self = this
+      self.$confirm('Restore all items in trash?', 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        Model.revertTrash()
+          .then(function (response) {
+            self.$message({
+              message: 'Restore trash successfully!',
+              type: 'success'
+            })
+            self.selectAndRefresh(self.selectedFolderId, '')
+            self.loadFolderList()
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Restore trash failed!')
           })
       })
     },

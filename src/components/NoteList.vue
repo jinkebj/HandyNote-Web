@@ -199,7 +199,7 @@ export default {
         .then(function (response) {
           self.listItems = response.data
           self.selectedItemId === ''
-          if (self.selectedItemId === '' && self.listItems.length > 0) {
+          if (self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
           }
         })
@@ -257,6 +257,7 @@ export default {
       Model.restoreTrash(itemId)
         .then(function (response) {
           self.$bus.$emit('deleteNote', response.data._id)
+          if (response.data.type === 'folder') self.$bus.$emit('refreshFolderList', 'mytest-Trash')
           self.$message({
             message: 'Restore item successfully!',
             type: 'success'
