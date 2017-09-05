@@ -11,7 +11,7 @@
         <el-popover
           ref="noteMetaData"
           placement="bottom"
-          width="230"
+          width="260"
           trigger="click">
           <el-row>
             <el-col :span="12"><div class="note-meta-info">Name:</div></el-col>

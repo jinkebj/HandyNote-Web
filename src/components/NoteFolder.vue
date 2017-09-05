@@ -180,6 +180,10 @@
   padding: 0px 10px;
 }
 
+.my-folder-form .el-dialog--small {
+  width: 30%;
+}
+
 .my-folder-form .el-dialog__body {
   padding: 20px 20px 10px 20px;
 }
@@ -383,11 +387,15 @@ export default {
     },
 
     selectRecent () {
+      if (this.selectedFolderId === 'mytest-Recent') return
+
       this.selectAndRefresh('mytest-Recent', '')
       this.$refs.tree.store.setCurrentNode('')
     },
 
     selectTrash () {
+      if (this.selectedFolderId === 'mytest-Trash') return
+
       this.selectAndRefresh('mytest-Trash', '')
       this.$refs.tree.store.setCurrentNode('')
     },
