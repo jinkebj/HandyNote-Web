@@ -6,15 +6,29 @@
 
     <div class="note-container" v-show="noteId !== ''">
       <div class="note-header">
-        <input type="text" class="note-title" v-model="noteName">
+        <input type="text" class="note-title" v-model="noteItem.name">
 
         <el-popover
           ref="noteMetaData"
           placement="bottom"
-          title="Note Information"
-          width="200"
-          trigger="click"
-          content="This is the detail information of note.">
+          width="230"
+          trigger="click">
+          <el-row>
+            <el-col :span="12"><div class="note-meta-info">Name:</div></el-col>
+            <el-col :span="12"><div class="note-meta-info">{{noteItem.name}}</div></el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12"><div class="note-meta-info">Created Time:</div></el-col>
+            <el-col :span="12"><div class="note-meta-info">{{noteItem.created_at | fmtDateTime}}</div></el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12"><div class="note-meta-info">Updated Time:</div></el-col>
+            <el-col :span="12"><div class="note-meta-info">{{noteItem.updated_at | fmtDateTime}}</div></el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12"><div class="note-meta-info">Folder:</div></el-col>
+            <el-col :span="12"><div class="note-meta-info">{{noteItem.folder_name}}</div></el-col>
+          </el-row>
         </el-popover>
 
         <div class="note-controls">
@@ -34,7 +48,9 @@
               <el-button icon="more" class="note-controls-icon"></el-button>
             </el-tooltip>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item class="my-folder-action-item"><span class="my-folder-action-item-inner" @click="showMoveFolder">Move To</span></el-dropdown-item>
+              <el-dropdown-item class="my-folder-action-item">
+                <span class="my-folder-action-item-inner" @click="showMoveFolder">Move To</span>
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -48,7 +64,7 @@
       <div slot="footer">
         <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
         <el-button type="primary" @click="moveNote"
-          :disabled="selectedMoveToFolderId === ''">
+          :disabled="selectedMoveToFolderId === '' || selectedMoveToFolderId === noteItem.folder_id">
           Confirm
         </el-button>
       </div>
@@ -74,6 +90,11 @@
   font-size: 150%;
 
   flex: 1;
+}
+
+.note-meta-info {
+  padding: 5px;
+  font-size: 13px;
 }
 
 .note-controls {
@@ -127,8 +148,8 @@ export default {
   data () {
     return {
       quill: {},
-      noteName: '',
       noteId: '',
+      noteItem: {name: ''},
       folderRoot: {
         type: 0,
         id: 'mytest-Root',
@@ -180,11 +201,12 @@ export default {
     updateNote () {
       const self = this
       Model.updateNote(self.noteId, {
-        name: this.noteName,
+        name: this.noteItem.name,
         text: this.quill.getText(),
         contents: this.quill.getContents().ops
       })
         .then(function (response) {
+          self.noteItem = response.data
           self.$bus.$emit('updateNote', response.data)
           self.$message({
             message: 'Save note successfully!',
@@ -223,7 +245,7 @@ export default {
       const self = this
       Model.getNote(self.noteId)
         .then(function (response) {
-          self.noteName = response.data.name
+          self.noteItem = response.data
           self.quill.setContents(response.data.contents)
         })
         .catch(function (error) {
@@ -251,6 +273,11 @@ export default {
 
     moveNote () {
       const self = this
+      if (self.noteItem.folder_id === self.selectedMoveToFolderId) {
+        self.showMoveToFolderForm = false
+        return
+      }
+
       Model.updateNote(self.noteId, {
         folder_id: self.selectedMoveToFolderId
       })

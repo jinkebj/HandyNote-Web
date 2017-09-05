@@ -321,7 +321,7 @@ export default {
         .catch(function (error) {
           console.log(error)
         })
-      this.showMoveToFolderForm = true
+      self.showMoveToFolderForm = true
     },
 
     moveFolder () {
