@@ -34,14 +34,25 @@
               <el-button icon="more" class="note-controls-icon"></el-button>
             </el-tooltip>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item><span class="note-controls-text">Move To</span></el-dropdown-item>
-              <el-dropdown-item><span class="note-controls-text">Export</span></el-dropdown-item>
+              <el-dropdown-item class="my-folder-action-item"><span class="my-folder-action-item-inner" @click="showMoveFolder">Move To</span></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </div>
       <div id="note-editor"></div>
     </div>
+    <el-dialog class="my-folder-form" title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
+      <el-tree :data="moveToFolders" default-expand-all highlight-current :expand-on-click-node="false"
+        @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
+      </el-tree>
+      <div slot="footer">
+        <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
+        <el-button type="primary" @click="moveNote"
+          :disabled="selectedMoveToFolderId === ''">
+          Confirm
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -83,10 +94,6 @@
   padding-left: 6px;
 }
 
-.note-controls-text {
-  font-size: 14px;
-}
-
 #note-editor {
   border: 0;
   font-size: 16px;
@@ -111,6 +118,7 @@
 
 <script>
 import Model from '@/models'
+import {prepareFolderData} from '@/util'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageResize } from '@/quill_modules/ImageResize'
@@ -120,7 +128,17 @@ export default {
     return {
       quill: {},
       noteName: '',
-      noteId: ''
+      noteId: '',
+      folderRoot: {
+        type: 0,
+        id: 'mytest-Root',
+        label: 'My Folders',
+        ancestor_ids: [],
+        children: []
+      },
+      moveToFolders: [],
+      showMoveToFolderForm: false,
+      selectedMoveToFolderId: ''
     }
   },
 
@@ -211,6 +229,42 @@ export default {
         .catch(function (error) {
           console.log(error)
           self.$message.error('Failed to load note!')
+        })
+    },
+
+    showMoveFolder () {
+      const self = this
+      self.selectedMoveToFolderId = ''
+      Model.getFolderList()
+        .then(function (response) {
+          self.moveToFolders = prepareFolderData(self.folderRoot, response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      self.showMoveToFolderForm = true
+    },
+
+    selectMoveToFolder (data) {
+      this.selectedMoveToFolderId = data.id
+    },
+
+    moveNote () {
+      const self = this
+      Model.updateNote(self.noteId, {
+        folder_id: self.selectedMoveToFolderId
+      })
+        .then(function (response) {
+          self.$message({
+            message: 'Move note successfully!',
+            type: 'success'
+          })
+          self.showMoveToFolderForm = false
+          self.$bus.$emit('deleteNote', self.noteId)
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Move note failed!')
         })
     }
   }
