@@ -2,10 +2,48 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
-import locale from 'element-ui/lib/locale/lang/en'
+// import ElementUI components
+import {
+  Dialog,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+  ButtonGroup,
+  Popover,
+  Tooltip,
+  Tree,
+  Icon,
+  Row,
+  Col,
+  Loading,
+  MessageBox,
+  Message
+} from 'element-ui'
 
+Vue.use(Dialog)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
+Vue.use(Button)
+Vue.use(ButtonGroup)
+Vue.use(Popover)
+Vue.use(Tooltip)
+Vue.use(Tree)
+Vue.use(Icon)
+Vue.use(Row)
+Vue.use(Col)
+
+Vue.use(Loading.directive)
+
+Vue.prototype.$loading = Loading.service
+Vue.prototype.$msgbox = MessageBox
+Vue.prototype.$alert = MessageBox.alert
+Vue.prototype.$confirm = MessageBox.confirm
+Vue.prototype.$prompt = MessageBox.prompt
+Vue.prototype.$message = Message
+
+// import HandyNote components
 import App from '@/App'
 import router from '@/router'
 import * as filters from '@/util/filters'
@@ -20,8 +58,6 @@ Vue.prototype.$bus = EventBus
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
-
-Vue.use(ElementUI, { locale })
 
 /* eslint-disable no-new */
 new Vue({
