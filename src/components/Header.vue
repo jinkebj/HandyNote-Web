@@ -10,7 +10,8 @@
     <div class="header-gap"></div>
 
     <el-dropdown>
-      <el-button type="primary" icon="date">
+      <el-button type="primary">
+        <!-- <i class="material-icons">account_circle</i> -->
         <span class="header-text-with-icon">jinkebj</span>
       </el-button>
       <el-dropdown-menu slot="dropdown">
@@ -21,7 +22,7 @@
     </el-dropdown>
 
     <el-dropdown>
-      <el-button type="primary" icon="setting"></el-button>
+      <el-button type="primary"><i class="material-icons">view_quilt</i></el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
           <span class="my-folder-action-item-inner">3 Column <i class="header-text-with-icon el-icon-check"></i></span>
@@ -36,7 +37,7 @@
     </el-dropdown>
 
     <el-dropdown>
-      <el-button type="primary" icon="date"></el-button>
+      <el-button type="primary"><i class="material-icons">language</i></el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
           <span class="my-folder-action-item-inner">Automatic <i class="header-text-with-icon el-icon-check"></i></span>

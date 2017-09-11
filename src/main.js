@@ -45,6 +45,9 @@ Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$prompt = MessageBox.prompt
 Vue.prototype.$message = Message
 
+// import Material Icons
+import '@/assets/fonts/material-icons.css'
+
 // import HandyNote components
 import App from '@/App'
 import router from '@/router'
