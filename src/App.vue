@@ -1,9 +1,6 @@
 <template>
   <div class="container">
-    <div class="header">
-      <el-button type="primary" icon="menu" @click="toggleNoteFolder"></el-button>
-      <my-header></my-header>
-    </div>
+    <my-header></my-header>
 
     <div class="content">
       <div class="note-folder">
@@ -34,7 +31,6 @@ html, body {
   background-repeat: no-repeat;
   background-position: 50%;
   border-left: 1px solid #ddd;
-  /*border-right: 1px solid #ddd;*/
 }
 
 .gutter:hover {
@@ -57,16 +53,6 @@ html, body {
   justify-content: flex-start;
   align-items: stretch;
   align-content: stretch;
-}
-
-.header {
-  flex: 0 50px;
-  background: #20A0FF;
-}
-
-.header .el-button {
-  width: 50px;
-  height: 50px;
 }
 
 .content {

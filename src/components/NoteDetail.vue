@@ -35,16 +35,14 @@
           <el-button @click="updateNote">Save</el-button>
 
           <el-button-group class="note-controls-icon-group">
-            <el-tooltip content="Note Infomation" placement="top" effect="light">
-              <el-button icon="information" class="note-controls-icon" v-popover:noteMetaData></el-button>
-            </el-tooltip>
-            <el-tooltip content="Delete" placement="top" effect="light">
+            <el-button icon="information" class="note-controls-icon" v-popover:noteMetaData></el-button>
+            <el-tooltip content="Delete" placement="bottom" effect="light">
               <el-button icon="delete" class="note-controls-icon" @click="deleteNote"></el-button>
             </el-tooltip>
           </el-button-group>
 
           <el-dropdown trigger="click">
-            <el-tooltip content="More Action" placement="top" effect="light">
+            <el-tooltip content="More Action" placement="bottom" effect="light">
               <el-button icon="more" class="note-controls-icon"></el-button>
             </el-tooltip>
             <el-dropdown-menu slot="dropdown">
@@ -78,7 +76,7 @@
 }
 
 .note-header {
-  padding: 15px 15px;
+  padding: 10px 15px;
 
   display: flex;
   flex-flow: row;
