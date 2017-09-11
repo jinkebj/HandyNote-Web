@@ -7,11 +7,11 @@
       <div class="list-item" @click="selectItem(listItem)"
         :class="selectedItemId === listItem._id ? 'list-item-selected' : 'list-item-unselected'">
         <h4 class="list-item-subject">
-          <i class="list-item-subject-icon el-icon-message" v-if="listItem.folder_name === undefined"></i>
+          <i class="list-item-subject-icon material-icons" v-if="listItem.folder_name === undefined">folder</i>
           <span class="list-item-subject-title">{{listItem.name | truncate(50)}}</span>
-          <i class="list-item-subject-action list-item-margin el-icon-check"
-            v-if="listItem.deleted === 1" @click="restoreItem(listItem._id)"></i>
-          <i class="list-item-subject-action el-icon-delete2" @click="deleteItem(listItem)"></i>
+          <i class="list-item-subject-action list-item-margin material-icons"
+            v-if="listItem.deleted === 1" @click="restoreItem(listItem._id)">restore</i>
+          <i class="list-item-subject-action material-icons" @click="deleteItem(listItem)">delete</i>
         </h4>
         <p class="list-item-desc">
           {{listItem.digest | truncate(100)}}
@@ -63,8 +63,10 @@
 }
 
 .list-item-subject {
+  min-height: 24px;
   display: flex;
   flex-flow: row;
+  align-items: center;
 }
 
 .list-item-margin,
@@ -84,8 +86,7 @@
   display: inline-flex;
 }
 
-.el-icon-check:hover,
-.el-icon-delete2:hover {
+.material-icons:hover {
   color: #20A0FF;
 }
 

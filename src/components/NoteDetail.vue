@@ -35,15 +35,21 @@
           <el-button @click="updateNote">Save</el-button>
 
           <el-button-group class="note-controls-icon-group">
-            <el-button icon="information" class="note-controls-icon" v-popover:noteMetaData></el-button>
+            <el-button class="note-controls-icon" v-popover:noteMetaData>
+              <i class="material-icons">info_outline</i>
+            </el-button>
             <el-tooltip content="Delete" placement="bottom" effect="light">
-              <el-button icon="delete" class="note-controls-icon" @click="deleteNote"></el-button>
+              <el-button class="note-controls-icon" @click="deleteNote">
+                <i class="material-icons">delete</i>
+              </el-button>
             </el-tooltip>
           </el-button-group>
 
           <el-dropdown trigger="click">
             <el-tooltip content="More Action" placement="bottom" effect="light">
-              <el-button icon="more" class="note-controls-icon"></el-button>
+              <el-button class="note-controls-icon">
+                <i class="material-icons">more_vert</i>
+              </el-button>
             </el-tooltip>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item class="my-folder-action-item">
@@ -76,7 +82,7 @@
 }
 
 .note-header {
-  padding: 10px 15px;
+  padding: 5px 15px;
 
   display: flex;
   flex-flow: row;
@@ -101,6 +107,7 @@
   display: flex;
   flex-flow: row;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .note-controls-icon-group {

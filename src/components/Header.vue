@@ -11,8 +11,10 @@
 
     <el-dropdown>
       <el-button type="primary">
-        <!-- <i class="material-icons">account_circle</i> -->
-        <span class="header-text-with-icon">jinkebj</span>
+        <span class="header-text-icon-container">
+          <i class="material-icons">account_circle</i>
+          <span class="header-text-with-icon">mytest</span>
+        </span>
       </el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
@@ -71,6 +73,13 @@
 
 .header-gap {
   flex: auto;
+}
+
+.header-text-icon-container {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header-text-with-icon {
