@@ -9,34 +9,11 @@
 
     <div class="header-gap"></div>
 
-    <el-dropdown>
-      <el-button type="primary">
-        <span class="header-text-icon-container">
-          <i class="material-icons">account_circle</i>
-          <span class="header-text-with-icon">mytest</span>
-        </span>
-      </el-button>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">Log Out</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-
-    <el-dropdown>
-      <el-button type="primary"><i class="material-icons">view_quilt</i></el-button>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">3 Column <i class="header-text-with-icon el-icon-check"></i></span>
-        </el-dropdown-item>
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">2 Column</span>
-        </el-dropdown-item>
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">1 Column</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
+    <el-radio-group v-model="viewType" size="small">
+      <el-radio-button label="3" :class="viewType === 3 ? 'is-active' : ''"><i class="material-icons">view_column</i></el-radio-button>
+      <el-radio-button label="2" :class="viewType === 2 ? 'is-active' : ''"><i class="material-icons">chrome_reader_mode</i></el-radio-button>
+      <el-radio-button label="1" :class="viewType === 1 ? 'is-active' : ''"><i class="material-icons">web_asset</i></el-radio-button>
+    </el-radio-group>
 
     <el-dropdown>
       <el-button type="primary"><i class="material-icons">language</i></el-button>
@@ -52,8 +29,39 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
+
+    <el-dropdown>
+      <el-button type="primary">
+        <span class="header-text-icon-container">
+          <i class="material-icons">account_circle</i>
+          <span class="header-text-with-icon">mytest</span>
+        </span>
+      </el-button>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item class="my-folder-action-item">
+          <span class="my-folder-action-item-inner">Log Out</span>
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
   </div>
 </template>
+
+<style>
+.header-container .el-radio-button:first-child .el-radio-button__inner {
+  border: none;
+}
+
+.header-container .el-radio-button__inner {
+  background: #20A0FF;
+  border: none;
+}
+
+.header-container .el-radio-button.is-active .el-radio-button__inner {
+  background-color: #1D8CE0;
+  border-color: #1D8CE0;
+  box-shadow: -1px 0px 0px 0px #1D8CE0;
+}
+</style>
 
 <style scoped>
 .header-container {
@@ -86,12 +94,33 @@
   margin-left: 5px;
   font-size: 16px;
 }
+
+.header-container .el-radio-button .material-icons {
+  color: #FFFFFF;
+}
+
+.header-container .el-radio-button.is-active .material-icons {
+  color: #F7BA2A;
+}
+
+.header-container .el-radio-button .material-icons:hover {
+  color: #F7BA2A;
+}
 </style>
 
 <script>
 export default {
   data () {
     return {
+      viewType: 3
+    }
+  },
+
+  watch: {
+    viewType: function (val, oldVal) {
+      if (val !== oldVal) {
+        this.$bus.$emit('switchViewType', val)
+      }
     }
   }
 }

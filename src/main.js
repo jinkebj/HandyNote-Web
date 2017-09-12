@@ -9,6 +9,8 @@ import {
   DropdownMenu,
   DropdownItem,
   Input,
+  RadioGroup,
+  RadioButton,
   Button,
   ButtonGroup,
   Popover,
@@ -27,6 +29,8 @@ Vue.use(Dropdown)
 Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
 Vue.use(Input)
+Vue.use(RadioGroup)
+Vue.use(RadioButton)
 Vue.use(Button)
 Vue.use(ButtonGroup)
 Vue.use(Popover)

@@ -130,6 +130,17 @@ export default {
         window.localStorage.setItem('hn-pane-sizes', JSON.stringify(self.split.getSizes()))
       }
     })
+
+    this.$bus.$on('switchViewType', (viewType) => {
+      if (viewType === '2') {
+        this.split.collapse(0)
+      } else if (viewType === '1') {
+        this.split.collapse(0)
+        this.split.collapse(1)
+      } else {
+        this.split.setSizes(this.getPaneSize())
+      }
+    })
   },
 
   methods: {
@@ -142,15 +153,6 @@ export default {
       }
 
       return sizes
-    },
-
-    toggleNoteFolder () {
-      let sizes = this.split.getSizes()
-      if (sizes[0] < 1) {
-        this.split.setSizes(this.getPaneSize())
-      } else {
-        this.split.collapse(0)
-      }
     }
   }
 }
