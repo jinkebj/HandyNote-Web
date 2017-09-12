@@ -14,7 +14,6 @@ import {
   Button,
   ButtonGroup,
   Popover,
-  Tooltip,
   Tree,
   Icon,
   Row,
@@ -34,7 +33,6 @@ Vue.use(RadioButton)
 Vue.use(Button)
 Vue.use(ButtonGroup)
 Vue.use(Popover)
-Vue.use(Tooltip)
 Vue.use(Tree)
 Vue.use(Icon)
 Vue.use(Row)

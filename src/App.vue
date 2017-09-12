@@ -133,13 +133,13 @@ export default {
 
     this.$bus.$on('switchViewType', (viewType) => {
       if (viewType === '2') {
-        this.split.collapse(0)
+        this.split.setSizes([0, 25, 75])
       } else if (viewType === '1') {
-        this.split.collapse(0)
-        this.split.collapse(1)
+        this.split.setSizes([0, 0, 100])
       } else {
-        this.split.setSizes(this.getPaneSize())
+        this.split.setSizes([12, 20, 68])
       }
+      window.localStorage.setItem('hn-pane-sizes', JSON.stringify(self.split.getSizes()))
     })
   },
 
@@ -151,7 +151,6 @@ export default {
       } else {
         sizes = [12, 16, 72]  // default pane size
       }
-
       return sizes
     }
   }

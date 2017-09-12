@@ -12,7 +12,7 @@
           ref="noteMetaData"
           placement="bottom"
           width="260"
-          trigger="click">
+          trigger="hover">
           <el-row>
             <el-col :span="12"><div class="note-meta-info">Name:</div></el-col>
             <el-col :span="12"><div class="note-meta-info">{{noteItem.name}}</div></el-col>
@@ -38,19 +38,15 @@
             <el-button class="note-controls-icon" v-popover:noteMetaData>
               <i class="material-icons">info_outline</i>
             </el-button>
-            <el-tooltip content="Delete" placement="bottom" effect="light">
-              <el-button class="note-controls-icon" @click="deleteNote">
-                <i class="material-icons">delete</i>
-              </el-button>
-            </el-tooltip>
+            <el-button class="note-controls-icon" @click="deleteNote">
+              <i class="material-icons">delete</i>
+            </el-button>
           </el-button-group>
 
-          <el-dropdown trigger="click">
-            <el-tooltip content="More Action" placement="bottom" effect="light">
-              <el-button class="note-controls-icon">
-                <i class="material-icons">more_vert</i>
-              </el-button>
-            </el-tooltip>
+          <el-dropdown>
+            <el-button class="note-controls-icon">
+              <i class="material-icons">more_vert</i>
+            </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item class="my-folder-action-item">
                 <span class="my-folder-action-item-inner" @click="showMoveFolder">Move To</span>

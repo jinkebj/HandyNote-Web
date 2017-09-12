@@ -10,12 +10,18 @@
     <div class="header-gap"></div>
 
     <el-radio-group v-model="viewType" size="small">
-      <el-radio-button label="3" :class="viewType === 3 ? 'is-active' : ''"><i class="material-icons">view_column</i></el-radio-button>
-      <el-radio-button label="2" :class="viewType === 2 ? 'is-active' : ''"><i class="material-icons">chrome_reader_mode</i></el-radio-button>
-      <el-radio-button label="1" :class="viewType === 1 ? 'is-active' : ''"><i class="material-icons">web_asset</i></el-radio-button>
+      <el-radio-button label="3" :class="viewType === 3 ? 'is-active' : ''">
+        <i class="material-icons">view_week</i>
+      </el-radio-button>
+      <el-radio-button label="2" :class="viewType === 2 ? 'is-active' : ''">
+        <i class="material-icons">chrome_reader_mode</i>
+      </el-radio-button>
+      <el-radio-button label="1" :class="viewType === 1 ? 'is-active' : ''">
+        <i class="material-icons">web_asset</i>
+      </el-radio-button>
     </el-radio-group>
 
-    <el-dropdown>
+    <!-- <el-dropdown>
       <el-button type="primary"><i class="material-icons">language</i></el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
@@ -28,7 +34,7 @@
           <span class="my-folder-action-item-inner">Chinese</span>
         </el-dropdown-item>
       </el-dropdown-menu>
-    </el-dropdown>
+    </el-dropdown> -->
 
     <el-dropdown>
       <el-button type="primary">
@@ -75,7 +81,7 @@
 }
 
 .header-search {
-  flex: 0 1 200px;
+  flex: 0 1 300px;
   margin-left: 10px;
 }
 
@@ -112,14 +118,36 @@
 export default {
   data () {
     return {
-      viewType: 3
+      viewType: -1 // -1: not initialized, 1: 1 column, 2: 2 columns, 3: 3 columns
     }
   },
 
   watch: {
     viewType: function (val, oldVal) {
-      if (val !== oldVal) {
+      if (oldVal !== -1 && val !== oldVal) {
         this.$bus.$emit('switchViewType', val)
+      }
+    }
+  },
+
+  mounted () {
+    this.initViewType()
+  },
+
+  methods: {
+    initViewType () {
+      let sizes = window.localStorage.getItem('hn-pane-sizes')
+      if (sizes) {
+        sizes = JSON.parse(sizes)
+      } else {
+        sizes = [12, 20, 68]  // default pane size
+      }
+      if (sizes[0] < 1 && sizes[1] < 1) {
+        this.viewType = 1
+      } else if (sizes[0] < 1) {
+        this.viewType = 2
+      } else {
+        this.viewType = 3
       }
     }
   }
