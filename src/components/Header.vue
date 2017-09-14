@@ -45,7 +45,7 @@
       </el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">Log Out</span>
+          <span class="my-folder-action-item-inner" @click="$router.replace('/login')">Log Out</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
