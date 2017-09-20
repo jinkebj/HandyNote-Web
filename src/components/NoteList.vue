@@ -107,10 +107,13 @@
 
 <script>
 import Model from '@/models'
+import {getCurUsrRecentFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
+      recentFolderId: getCurUsrRecentFolderId(),
+      trashFolderId: getCurUsrTrashFolderId(),
       listItems: [],
       selectedItemId: '',
       selectedItemType: 0 // 0: note, 1: folder
@@ -133,9 +136,9 @@ export default {
 
     this.$bus.$on('refreshNoteList', (selectedFolderId, selectedNoteId) => {
       this.selectedItemId = selectedNoteId
-      if (selectedFolderId === 'mytest-Recent') {
+      if (selectedFolderId === this.recentFolderId) {
         this.loadNoteList()
-      } else if (selectedFolderId === 'mytest-Trash') {
+      } else if (selectedFolderId === this.trashFolderId) {
         this.loadTrash()
       } else {
         this.loadNoteList({ folder_id: selectedFolderId })
@@ -258,7 +261,7 @@ export default {
       Model.restoreTrash(itemId)
         .then(function (response) {
           self.$bus.$emit('deleteNote', response.data._id)
-          if (response.data.type === 'folder') self.$bus.$emit('refreshFolderList', 'mytest-Trash')
+          if (response.data.type === 'folder') self.$bus.$emit('refreshFolderList', self.trashFolderId)
           self.$message({
             message: 'Restore item successfully!',
             type: 'success'

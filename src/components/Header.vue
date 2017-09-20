@@ -40,12 +40,12 @@
       <el-button type="primary">
         <span class="header-text-icon-container">
           <i class="material-icons">account_circle</i>
-          <span class="header-text-with-icon">mytest</span>
+          <span class="header-text-with-icon">{{loginUser}}</span>
         </span>
       </el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner" @click="$router.replace('/login')">Log Out</span>
+          <span class="my-folder-action-item-inner" @click="logout">Log Out</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -115,9 +115,12 @@
 </style>
 
 <script>
+import {getCurUsrId} from '@/util'
+
 export default {
   data () {
     return {
+      loginUser: getCurUsrId(),
       viewType: -1 // -1: not initialized, 1: 1 column, 2: 2 columns, 3: 3 columns
     }
   },
@@ -149,6 +152,12 @@ export default {
       } else {
         this.viewType = 3
       }
+    },
+
+    logout () {
+      window.localStorage.removeItem('hn-token')
+      window.localStorage.removeItem('hn-user')
+      this.$router.replace('/login')
     }
   }
 }

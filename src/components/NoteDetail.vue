@@ -140,7 +140,7 @@
 
 <script>
 import Model from '@/models'
-import {prepareFolderData} from '@/util'
+import {prepareFolderData, getCurUsrRootFolderId} from '@/util'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageResize } from '@/quill_modules/ImageResize'
@@ -153,7 +153,7 @@ export default {
       noteItem: {name: ''},
       folderRoot: {
         type: 0,
-        id: 'mytest-Root',
+        id: getCurUsrRootFolderId(),
         label: 'My Folders',
         ancestor_ids: [],
         children: []

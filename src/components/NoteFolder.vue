@@ -2,7 +2,7 @@
   <div class="folder-container">
     <el-button class="my-action" @click="addNote">Compose</el-button>
 
-    <div class="my-recent" :class="selectedFolderId === 'mytest-Recent' ? 'my-recent-selected' : 'my-recent-unselected'"
+    <div class="my-recent" :class="selectedFolderId === recentFolderId ? 'my-recent-selected' : 'my-recent-unselected'"
       @click="selectRecent">
       <i class="el-icon-date"></i>Recent Notes
     </div>
@@ -12,7 +12,7 @@
       @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
 
-    <div class="my-trash" :class="selectedFolderId === 'mytest-Trash' ? 'my-trash-selected' : 'my-trash-unselected'"
+    <div class="my-trash" :class="selectedFolderId === trashFolderId ? 'my-trash-selected' : 'my-trash-unselected'"
       @click="selectTrash">
       <i class="el-icon-delete2"></i>
       <span class="my-trash-name">Trash</span>
@@ -191,15 +191,18 @@
 
 <script>
 import Model from '@/models'
-import {prepareFolderData} from '@/util'
+import {prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
+      rootFolderId: getCurUsrRootFolderId(),
+      recentFolderId: getCurUsrRecentFolderId(),
+      trashFolderId: getCurUsrTrashFolderId(),
       noteFolders: [
         {
           type: 0,
-          id: 'mytest-Root',
+          id: getCurUsrRootFolderId(),
           label: 'My Folders',
           ancestor_ids: [],
           children: []
@@ -212,7 +215,7 @@ export default {
       moveToFolders: [],
       showMoveToFolderForm: false,
       selectedMoveToFolderId: '',
-      selectedFolderId: 'mytest-Recent'
+      selectedFolderId: getCurUsrRecentFolderId()
     }
   },
 
@@ -228,8 +231,8 @@ export default {
   methods: {
     addNote () {
       const self = this
-      if (self.selectedFolderId === 'mytest-Recent' || self.selectedFolderId === 'mytest-Trash') {
-        self.selectedFolderId = 'mytest-Root'
+      if (self.selectedFolderId === self.recentFolderId || self.selectedFolderId === self.trashFolderId) {
+        self.selectedFolderId = self.rootFolderId
       }
 
       Model.addNote({
@@ -387,16 +390,16 @@ export default {
     },
 
     selectRecent () {
-      if (this.selectedFolderId === 'mytest-Recent') return
+      if (this.selectedFolderId === this.recentFolderId) return
 
-      this.selectAndRefresh('mytest-Recent', '')
+      this.selectAndRefresh(this.recentFolderId, '')
       this.$refs.tree.store.setCurrentNode('')
     },
 
     selectTrash () {
-      if (this.selectedFolderId === 'mytest-Trash') return
+      if (this.selectedFolderId === this.trashFolderId) return
 
-      this.selectAndRefresh('mytest-Trash', '')
+      this.selectAndRefresh(this.trashFolderId, '')
       this.$refs.tree.store.setCurrentNode('')
     },
 

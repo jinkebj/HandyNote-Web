@@ -11,19 +11,19 @@
         </el-row>
 
         <el-row class="login-box-row">
-          <el-input placeholder="Username">
+          <el-input placeholder="Username" v-model="usr">
             <template slot="prepend"><i class="material-icons">person</i></template>
           </el-input>
         </el-row>
 
         <el-row class="login-box-row">
-          <el-input type="password" placeholder="Password">
+          <el-input type="password" placeholder="Password" v-model="pwd">
             <template slot="prepend"><i class="material-icons">vpn_key</i></template>
           </el-input>
         </el-row>
 
         <el-row type="flex" justify="end" class="login-box-row">
-          <el-button type="primary" @click="$router.replace('/dashboard')">Sign In</el-button>
+          <el-button type="primary" @click="doLogin">Sign In</el-button>
         </el-row>
       </div>
     </div>
@@ -76,9 +76,40 @@
 </style>
 
 <script>
-  export default {
-    data () {
-      return {}
+import Model from '@/models'
+
+export default {
+  data () {
+    return {
+      usr: '',
+      pwd: ''
+    }
+  },
+
+  methods: {
+    doLogin () {
+      const self = this
+
+      Model.login({
+        usr: this.usr,
+        pwd: this.pwd
+      })
+        .then(function (response) {
+          if (response.status === 200) {
+            window.localStorage.setItem('hn-token', response.data._id)
+            window.localStorage.setItem('hn-user', response.data.user_id)
+            self.$router.replace('/dashboard')
+          } else {
+            window.localStorage.removeItem('hn-token')
+            window.localStorage.removeItem('hn-user')
+            self.$message.error('Invalid user name or password, login failed!')
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Login failed!')
+        })
     }
   }
+}
 </script>

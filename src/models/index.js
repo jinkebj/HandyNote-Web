@@ -8,6 +8,10 @@ Model.getHttpPrototype = () => {
   return http
 }
 
+Model.login = (params) => {
+  return http.post(BaseAPIUrl + '/tokens/', params)
+}
+
 Model.getNoteList = (params) => {
   return http.get(BaseAPIUrl + '/notes', { params: params })
 }

@@ -1,7 +1,7 @@
 export * from '@/util/filters'
 
 export const prepareFolderData = (topItem, inputData) => {
-  if (typeof inputData !== 'object' || inputData.length === 0) return []
+  if (typeof inputData !== 'object' || inputData.length === 0) return [topItem]
 
   let rootItem = JSON.parse(JSON.stringify(topItem)) // deep copy
   rootItem.children = []
@@ -41,7 +41,14 @@ export const prepareFolderData = (topItem, inputData) => {
       }
     })
   }
-  // console.log(itemMap.get('mytest-Root'))
 
   return [itemMap.get(topItem.id)]
 }
+
+export const getCurUsrId = () => { return window.localStorage.getItem('hn-user') }
+
+export const getCurUsrRootFolderId = () => { return window.localStorage.getItem('hn-user') + '-Root' }
+
+export const getCurUsrRecentFolderId = () => { return window.localStorage.getItem('hn-user') + '-Recent' }
+
+export const getCurUsrTrashFolderId = () => { return window.localStorage.getItem('hn-user') + '-Trash' }
