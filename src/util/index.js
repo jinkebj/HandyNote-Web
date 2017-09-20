@@ -1,7 +1,7 @@
 export * from '@/util/filters'
 
 export const prepareFolderData = (topItem, inputData) => {
-  if (inputData.length === 0) return
+  if (typeof inputData !== 'object' || inputData.length === 0) return []
 
   let rootItem = JSON.parse(JSON.stringify(topItem)) // deep copy
   rootItem.children = []

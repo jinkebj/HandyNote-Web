@@ -4,6 +4,10 @@ import {HANDYNOTE_SERVICE_API} from '@/../config'
 const Model = {}
 const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || HANDYNOTE_SERVICE_API
 
+Model.getHttpPrototype = () => {
+  return http
+}
+
 Model.getNoteList = (params) => {
   return http.get(BaseAPIUrl + '/notes', { params: params })
 }
