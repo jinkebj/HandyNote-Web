@@ -135,7 +135,9 @@ export default {
     this.loadNoteList()
 
     this.$bus.$on('refreshNoteList', (selectedFolderId, selectedNoteId) => {
+      this.selectedItemType = 0
       this.selectedItemId = selectedNoteId
+
       if (selectedFolderId === this.recentFolderId) {
         this.loadNoteList()
       } else if (selectedFolderId === this.trashFolderId) {
