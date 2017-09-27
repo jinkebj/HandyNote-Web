@@ -4,7 +4,7 @@
       <i class="el-icon-document"></i>&nbsp;&nbsp;No content
     </div>
 
-    <div class="note-container" v-show="noteId !== ''">
+    <div id="note-container" v-show="noteId !== ''">
       <div class="note-header">
         <input type="text" class="note-title" :readonly="!editMode" v-model="noteItem.name">
 
@@ -131,8 +131,8 @@
 </template>
 
 <style scoped>
-.note-container {
-  height: calc(100vh - 160px);
+#note-container {
+  height: calc(100vh - 110px);
 }
 
 .note-header {
@@ -257,8 +257,8 @@ export default {
       this.noteId = id
       this.noteItem.name = 'loading...'
       this.quill.setText('loading...')
-      this.editMode = false
-      this.quill.enable(this.editMode)
+
+      if (this.editMode === true) this.toggleeditMode()
       this.loadNote()
     })
   },
@@ -267,6 +267,13 @@ export default {
     toggleeditMode () {
       this.editMode = !this.editMode
       this.quill.enable(this.editMode)
+
+      // adjust note-container height
+      if (this.editMode === true) {
+        window.document.getElementById('note-container').style.height = 'calc(100vh - 150px)'
+      } else {
+        window.document.getElementById('note-container').style.height = 'calc(100vh - 110px)'
+      }
     },
 
     updateNote () {

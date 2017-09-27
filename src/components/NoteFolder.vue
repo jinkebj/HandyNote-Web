@@ -83,6 +83,11 @@
   color: #FFFFFF;
 }
 
+.my-recent-unselected,
+.my-trash-unselected {
+  color: #324057;
+}
+
 .my-trash-selected .el-icon-setting {
   color: #FFFFFF;
 }
