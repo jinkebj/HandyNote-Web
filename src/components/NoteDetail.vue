@@ -6,7 +6,7 @@
 
     <div class="note-container" v-show="noteId !== ''">
       <div class="note-header">
-        <input type="text" class="note-title" v-model="noteItem.name">
+        <input type="text" class="note-title" :readonly="!editMode" v-model="noteItem.name">
 
         <el-popover
           ref="noteMetaData"
@@ -32,18 +32,23 @@
         </el-popover>
 
         <div class="note-controls">
-          <el-button @click="updateNote">Save</el-button>
+          <el-button v-show="noteItem.deleted === 0 && !editMode" @click="toggleeditMode">Edit</el-button>
+          <el-button v-show="editMode" @click="cancelUpdateNote">Cancel</el-button>
+          <el-button v-show="editMode" @click="updateNote">Save</el-button>
 
           <el-button-group class="note-controls-icon-group">
-            <el-button class="note-controls-icon" v-popover:noteMetaData>
+            <el-button class="note-controls-icon" v-popover:noteMetaData v-show="noteItem.deleted === 0">
               <i class="material-icons">info_outline</i>
+            </el-button>
+            <el-button class="note-controls-icon" @click="restoreItem" v-show="noteItem.deleted === 1">
+              <i class="material-icons">restore</i>
             </el-button>
             <el-button class="note-controls-icon" @click="deleteNote">
               <i class="material-icons">delete</i>
             </el-button>
           </el-button-group>
 
-          <el-dropdown>
+          <el-dropdown v-show="noteItem.deleted === 0 &&  !editMode">
             <el-button class="note-controls-icon">
               <i class="material-icons">more_vert</i>
             </el-button>
@@ -55,6 +60,59 @@
           </el-dropdown>
         </div>
       </div>
+
+      <div id="note-toolbar" v-show="editMode">
+        <span class="ql-formats">
+          <select class="ql-header">
+            <option value="1"></option>
+            <option value="2"></option>
+            <option value="3"></option>
+            <option value="4"></option>
+            <option value="5"></option>
+            <option value="6"></option>
+            <option selected></option>
+          </select>
+          <select class="ql-font"></select>
+          <select class="ql-size">
+            <option value="small"></option>
+            <option selected></option>
+            <option value="large"></option>
+            <option value="huge"></option>
+          </select>
+        </span>
+
+        <span class="ql-formats">
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+        </span>
+
+        <span class="ql-formats">
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
+        </span>
+
+        <span class="ql-formats">
+          <select class="ql-align"></select>
+          <button class="ql-indent" value="-1"></button>
+          <button class="ql-indent" value="+1"></button>
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+        </span>
+
+        <span class="ql-formats">
+          <button class="ql-blockquote"></button>
+          <button class="ql-code-block"></button>
+          <button class="ql-clean"></button>
+        </span>
+
+        <span class="ql-formats">
+          <button class="ql-link"></button>
+          <button class="ql-image"></button>
+        </span>
+      </div>
+
       <div id="note-editor"></div>
     </div>
     <el-dialog class="my-folder-form" title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
@@ -79,6 +137,7 @@
 
 .note-header {
   padding: 5px 15px;
+  border-bottom: 1px solid #ddd;
 
   display: flex;
   flex-flow: row;
@@ -98,7 +157,7 @@
 }
 
 .note-controls {
-  flex: 0 250px;
+  flex: 0 320px;
 
   display: flex;
   flex-flow: row;
@@ -116,6 +175,12 @@
   padding-left: 6px;
 }
 
+#note-toolbar {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
 #note-editor {
   border: 0;
   font-size: 16px;
@@ -131,13 +196,6 @@
 }
 </style>
 
-<style>
-.note-container .ql-toolbar.ql-snow {
-  border-left: none;
-  border-right: none;
-}
-</style>
-
 <script>
 import Model from '@/models'
 import {prepareFolderData, getCurUsrRootFolderId} from '@/util'
@@ -148,6 +206,7 @@ import { ImageResize } from '@/quill_modules/ImageResize'
 export default {
   data () {
     return {
+      editMode: false,
       quill: {},
       noteId: '',
       noteItem: {name: ''},
@@ -168,17 +227,19 @@ export default {
     Quill.register('modules/imageResize', ImageResize)
 
     this.quill = new Quill('#note-editor', {
+      readOnly: true,
       modules: {
-        toolbar: [
-          [{'header': [1, 2, 3, 4, 5, 6, false]}, {'font': []}, {'size': ['small', false, 'large', 'huge']}],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{'color': []}, {'background': []}],
-          [{'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}],
-          // [{'script': 'sub'}, {'script': 'super'}],
-          ['blockquote', 'code-block', 'clean'],
-          // ['video'],
-          ['link', 'image']
-        ],
+        toolbar: '#note-toolbar',
+        // [
+        //   [{'header': [1, 2, 3, 4, 5, 6, false]}, {'font': []}, {'size': ['small', false, 'large', 'huge']}],
+        //   ['bold', 'italic', 'underline', 'strike'],
+        //   [{'color': []}, {'background': []}],
+        //   [{'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}],
+        //   [{'script': 'sub'}, {'script': 'super'}],
+        //   ['blockquote', 'code-block', 'clean'],
+        //   / ['video'],
+        //   ['link', 'image']
+        // ],
         imageResize: {
           displaySize: true
         }
@@ -187,18 +248,27 @@ export default {
     })
 
     this.$bus.$on('loadNoteWithId', (id) => {
+      // for folder or invalid note id, display empty hint
       if (id === undefined || id.length === 0) {
         this.noteId = ''
         return
       }
 
       this.noteId = id
+      this.noteItem.name = 'loading...'
       this.quill.setText('loading...')
+      this.editMode = false
+      this.quill.enable(this.editMode)
       this.loadNote()
     })
   },
 
   methods: {
+    toggleeditMode () {
+      this.editMode = !this.editMode
+      this.quill.enable(this.editMode)
+    },
+
     updateNote () {
       const self = this
       Model.updateNote(self.noteId, {
@@ -213,6 +283,7 @@ export default {
             message: 'Save note successfully!',
             type: 'success'
           })
+          self.toggleeditMode()
         })
         .catch(function (error) {
           console.log(error)
@@ -220,26 +291,76 @@ export default {
         })
     },
 
-    deleteNote () {
+    cancelUpdateNote () {
       const self = this
-      self.$confirm('Move this note to trash?', 'Please Confirm', {
+      self.$confirm('Discard current change?', 'Please Confirm', {
         confirmButtonText: 'Yes',
         cancelButtonText: 'No',
         type: 'warning'
       }).then(() => {
-        Model.deleteNote(self.noteId)
-          .then(function (response) {
-            self.$bus.$emit('deleteNote', response.data._id)
-            self.$message({
-              message: 'Move note to trash successfully!',
-              type: 'success'
-            })
-          })
-          .catch(function (error) {
-            console.log(error)
-            self.$message.error('Move note to trash failed!')
-          })
+        self.loadNote()
+        self.toggleeditMode()
       })
+    },
+
+    deleteNote () {
+      const self = this
+      if (self.noteItem.deleted === 0) {
+        self.$confirm('Move this note to trash?', 'Please Confirm', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          Model.deleteNote(self.noteId)
+            .then(function (response) {
+              self.$bus.$emit('deleteNote', response.data._id)
+              self.$message({
+                message: 'Move note to trash successfully!',
+                type: 'success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error)
+              self.$message.error('Move note to trash failed!')
+            })
+        })
+      } else {
+        self.$confirm('Permanently delete this item? This action can NOT be undone!', 'Please Confirm', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          Model.deleteTrash(self.noteId)
+            .then(function (response) {
+              self.$bus.$emit('deleteNote', response.data._id)
+              self.$message({
+                message: 'Permanently delete item successfully!',
+                type: 'success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error)
+              self.$message.error('Delete item failed!')
+            })
+        })
+      }
+    },
+
+    restoreItem () {
+      const self = this
+      Model.restoreTrash(self.noteId)
+        .then(function (response) {
+          self.$bus.$emit('deleteNote', response.data._id)
+          if (response.data.type === 'folder') self.$bus.$emit('refreshFolderList', self.trashFolderId)
+          self.$message({
+            message: 'Restore item successfully!',
+            type: 'success'
+          })
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Restore item failed!')
+        })
     },
 
     loadNote () {
@@ -248,6 +369,12 @@ export default {
         .then(function (response) {
           self.noteItem = response.data
           self.quill.setContents(response.data.contents)
+
+          // go to edit mode if the note is newly created
+          if (response.data.contents.length === 0 && response.data.deleted === 0) {
+            self.editMode = true
+            self.quill.enable(self.editMode)
+          }
         })
         .catch(function (error) {
           console.log(error)

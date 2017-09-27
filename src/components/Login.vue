@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .login-page {
   height: 100vh;
   background: #EFF3F8;
