@@ -210,6 +210,7 @@ export default {
       quill: {},
       noteId: '',
       noteItem: {name: ''},
+      originNoteName: '',
       folderRoot: {
         type: 0,
         id: getCurUsrRootFolderId(),
@@ -270,7 +271,7 @@ export default {
 
       // adjust note-container height
       if (this.editMode === true) {
-        window.document.getElementById('note-container').style.height = 'calc(100vh - 150px)'
+        window.document.getElementById('note-container').style.height = 'calc(100vh - 160px)'
       } else {
         window.document.getElementById('note-container').style.height = 'calc(100vh - 110px)'
       }
@@ -300,14 +301,20 @@ export default {
 
     cancelUpdateNote () {
       const self = this
-      self.$confirm('Discard current change?', 'Please Confirm', {
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
-        type: 'warning'
-      }).then(() => {
-        self.loadNote()
+      if (self.originNoteName !== self.noteItem.name ||
+        JSON.stringify(self.quill.getContents().ops) !== JSON.stringify(self.noteItem.contents)) {
+        self.$confirm('Discard current change?', 'Please Confirm', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          self.noteItem.name = self.originNoteName
+          self.quill.setContents(self.noteItem.contents)
+          self.toggleeditMode()
+        })
+      } else {
         self.toggleeditMode()
-      })
+      }
     },
 
     deleteNote () {
@@ -374,6 +381,7 @@ export default {
       const self = this
       Model.getNote(self.noteId)
         .then(function (response) {
+          self.originNoteName = response.data.name
           self.noteItem = response.data
           self.quill.setContents(response.data.contents)
 
