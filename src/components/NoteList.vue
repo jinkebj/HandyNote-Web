@@ -107,12 +107,11 @@
 
 <script>
 import Model from '@/models'
-import {getCurUsrRecentFolderId, getCurUsrTrashFolderId} from '@/util'
+import {getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
-      recentFolderId: getCurUsrRecentFolderId(),
       trashFolderId: getCurUsrTrashFolderId(),
       listItems: [],
       selectedItemId: '',
@@ -138,8 +137,10 @@ export default {
       this.selectedItemType = 0
       this.selectedItemId = selectedNoteId
 
-      if (selectedFolderId === this.recentFolderId) {
+      if (selectedFolderId === getCurUsrRecentFolderId()) {
         this.loadNoteList()
+      } else if (selectedFolderId === getCurUsrStarFolderId()) {
+        this.loadNoteList({ starred: 1 })
       } else if (selectedFolderId === this.trashFolderId) {
         this.loadTrash()
       } else {

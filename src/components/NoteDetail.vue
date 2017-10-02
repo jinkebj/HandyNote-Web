@@ -37,6 +37,9 @@
           <el-button v-show="editMode" @click="updateNote">Save</el-button>
 
           <el-button-group class="note-controls-icon-group">
+            <el-button class="note-controls-icon" @click="toggleNoteStar" v-show="noteItem.deleted === 0">
+              <i class="material-icons">{{noteItem.starred === 1 ? 'star' : 'star_border'}}</i>
+            </el-button>
             <el-button class="note-controls-icon" v-popover:noteMetaData v-show="noteItem.deleted === 0">
               <i class="material-icons">info_outline</i>
             </el-button>
@@ -62,55 +65,43 @@
       </div>
 
       <div id="note-toolbar" v-show="editMode">
-        <span class="ql-formats">
-          <select class="ql-header">
-            <option value="1"></option>
-            <option value="2"></option>
-            <option value="3"></option>
-            <option value="4"></option>
-            <option value="5"></option>
-            <option value="6"></option>
-            <option selected></option>
-          </select>
-          <select class="ql-font"></select>
-          <select class="ql-size">
-            <option value="small"></option>
-            <option selected></option>
-            <option value="large"></option>
-            <option value="huge"></option>
-          </select>
-        </span>
+        <select class="ql-header">
+          <option value="1"></option>
+          <option value="2"></option>
+          <option value="3"></option>
+          <option value="4"></option>
+          <option value="5"></option>
+          <option value="6"></option>
+          <option selected></option>
+        </select>
+        <select class="ql-font"></select>
+        <select class="ql-size">
+          <option value="small"></option>
+          <option selected></option>
+          <option value="large"></option>
+          <option value="huge"></option>
+        </select>
 
-        <span class="ql-formats">
-          <button class="ql-bold"></button>
-          <button class="ql-italic"></button>
-          <button class="ql-underline"></button>
-          <button class="ql-strike"></button>
-        </span>
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+        <button class="ql-strike"></button>
 
-        <span class="ql-formats">
-          <select class="ql-color"></select>
-          <select class="ql-background"></select>
-        </span>
+        <select class="ql-color"></select>
+        <select class="ql-background"></select>
 
-        <span class="ql-formats">
-          <select class="ql-align"></select>
-          <button class="ql-indent" value="-1"></button>
-          <button class="ql-indent" value="+1"></button>
-          <button class="ql-list" value="ordered"></button>
-          <button class="ql-list" value="bullet"></button>
-        </span>
+        <select class="ql-align"></select>
+        <button class="ql-indent" value="-1"></button>
+        <button class="ql-indent" value="+1"></button>
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
 
-        <span class="ql-formats">
-          <button class="ql-blockquote"></button>
-          <button class="ql-code-block"></button>
-          <button class="ql-clean"></button>
-        </span>
+        <button class="ql-blockquote"></button>
+        <button class="ql-code-block"></button>
+        <button class="ql-clean"></button>
 
-        <span class="ql-formats">
-          <button class="ql-link"></button>
-          <button class="ql-image"></button>
-        </span>
+        <button class="ql-link"></button>
+        <button class="ql-image"></button>
       </div>
 
       <div id="note-editor"></div>
@@ -435,6 +426,30 @@ export default {
         .catch(function (error) {
           console.log(error)
           self.$message.error('Move note failed!')
+        })
+    },
+
+    toggleNoteStar () {
+      const self = this
+      let starValue = (self.noteItem.starred === 1 ? 0 : 1)
+      let hint = (starValue === 1 ? 'Star' : 'Unstar')
+      Model.updateNote(self.noteId, {
+        starred: starValue
+      })
+        .then(function (response) {
+          self.$message({
+            message: hint + ' note successfully!',
+            type: 'success'
+          })
+          self.noteItem.starred = starValue
+
+          if (starValue !== 1) {
+            self.$bus.$emit('deleteNote', response.data._id) // remove note from star list
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error(hint + ' note failed!')
         })
     }
   }

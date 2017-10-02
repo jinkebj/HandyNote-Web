@@ -7,6 +7,11 @@
       <i class="el-icon-date"></i>Recent Notes
     </div>
 
+    <div class="my-starred" :class="selectedFolderId === starFolderId ? 'my-starred-selected' : 'my-starred-unselected'"
+      @click="selectStarred">
+      <i class="el-icon-star-off"></i>Starred Notes
+    </div>
+
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
       @node-click="selectFolder" :current-node-key="selectedFolderId">
@@ -71,12 +76,14 @@
   margin: 10px;
 }
 
-.my-recent {
+.my-recent,
+.my-starred {
   flex: 0;
   padding: 10px 15px;
 }
 
 .my-recent-selected,
+.my-starred-selected,
 .my-trash-selected {
   cursor: pointer;
   background: #20A0FF;
@@ -84,6 +91,7 @@
 }
 
 .my-recent-unselected,
+.my-starred-unselected,
 .my-trash-unselected {
   color: #324057;
 }
@@ -93,6 +101,7 @@
 }
 
 .my-recent-unselected:hover,
+.my-starred-unselected:hover,
 .my-trash-unselected:hover {
   cursor: pointer;
   background: #E5E9F2;
@@ -121,6 +130,7 @@
 }
 
 .folder-container .el-icon-date,
+.folder-container .el-icon-star-off,
 .folder-container .el-icon-delete2 {
   margin-right: 10px;
 }
@@ -196,13 +206,14 @@
 
 <script>
 import Model from '@/models'
-import {prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrTrashFolderId} from '@/util'
+import {prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
       rootFolderId: getCurUsrRootFolderId(),
       recentFolderId: getCurUsrRecentFolderId(),
+      starFolderId: getCurUsrStarFolderId(),
       trashFolderId: getCurUsrTrashFolderId(),
       noteFolders: [
         {
@@ -236,7 +247,9 @@ export default {
   methods: {
     addNote () {
       const self = this
-      if (self.selectedFolderId === self.recentFolderId || self.selectedFolderId === self.trashFolderId) {
+      if (self.selectedFolderId === self.recentFolderId ||
+        self.selectedFolderId === self.starFolderId ||
+        self.selectedFolderId === self.trashFolderId) {
         self.selectedFolderId = self.rootFolderId
       }
 
@@ -398,6 +411,13 @@ export default {
       if (this.selectedFolderId === this.recentFolderId) return
 
       this.selectAndRefresh(this.recentFolderId, '')
+      this.$refs.tree.store.setCurrentNode('')
+    },
+
+    selectStarred () {
+      if (this.selectedFolderId === this.starFolderId) return
+
+      this.selectAndRefresh(this.starFolderId, '')
       this.$refs.tree.store.setCurrentNode('')
     },
 

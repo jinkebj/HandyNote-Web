@@ -51,4 +51,6 @@ export const getCurUsrRootFolderId = () => { return window.localStorage.getItem(
 
 export const getCurUsrRecentFolderId = () => { return window.localStorage.getItem('hn-user') + '-Recent' }
 
+export const getCurUsrStarFolderId = () => { return window.localStorage.getItem('hn-user') + '-Starred' }
+
 export const getCurUsrTrashFolderId = () => { return window.localStorage.getItem('hn-user') + '-Trash' }
