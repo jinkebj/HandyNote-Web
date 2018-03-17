@@ -189,7 +189,7 @@
 
 <script>
 import Model from '@/models'
-import {prepareFolderData, getCurUsrRootFolderId} from '@/util'
+import {prepareFolderData, getCurUsrRootFolderId, getResizedImgData} from '@/util'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageResize } from '@/quill_modules/ImageResize'
@@ -268,14 +268,19 @@ export default {
       }
     },
 
-    updateNote () {
+    async updateNote () {
       const self = this
+      let contentsJson = await this.handleImgResize(this.quill.getContents().ops)
+
       Model.updateNote(self.noteId, {
         name: this.noteItem.name,
         text: this.quill.getText(),
-        contents: this.quill.getContents().ops
+        contents: contentsJson
       })
         .then(function (response) {
+          let contentsJson = (typeof response.data.contents === 'object' ? response.data.contents
+            : JSON.parse(response.data.contents))
+          self.quill.setContents(self.handleImgUrl(contentsJson))
           self.noteItem = response.data
           self.$bus.$emit('updateNote', response.data)
           self.$message({
@@ -374,7 +379,10 @@ export default {
         .then(function (response) {
           self.originNoteName = response.data.name
           self.noteItem = response.data
-          self.quill.setContents(response.data.contents)
+
+          let contentsJson = (typeof response.data.contents === 'object' ? response.data.contents
+            : JSON.parse(response.data.contents))
+          self.quill.setContents(self.handleImgUrl(contentsJson))
 
           // go to edit mode if the note is newly created
           if (response.data.contents.length === 0 && response.data.deleted === 0) {
@@ -386,6 +394,43 @@ export default {
           console.log(error)
           self.$message.error('Failed to load note!')
         })
+    },
+
+    handleImgUrl (contentsJson) {
+      for (let i = 0; i < contentsJson.length; i++) {
+        let op = contentsJson[i]
+        if (op.insert !== undefined &&
+          typeof op.insert === 'object' &&
+          op.insert.image !== undefined &&
+          typeof op.insert.image === 'string' &&
+          !op.insert.image.startsWith('data:image') &&
+          !op.insert.image.startsWith('http') &&
+          !op.insert.image.startsWith('//')) {
+          op.insert.image = Model.getStaticUrl() + '/' + this.noteId + '/' + op.insert.image
+        }
+      }
+      return contentsJson
+    },
+
+    async handleImgResize (contentsJson) {
+      let retJson = []
+      for (let i = 0; i < contentsJson.length; i++) {
+        let op = contentsJson[i]
+        if (op.insert !== undefined &&
+          typeof op.insert === 'object' &&
+          op.insert.image !== undefined &&
+          typeof op.insert.image === 'string') {
+          if (op.insert.image.startsWith('data:image')) {
+            retJson.push({insert: {image: await getResizedImgData(op.insert.image)}})
+          } else {
+            let newImgUrl = op.insert.image.replace(Model.getStaticUrl() + '/' + this.noteId + '/', '')
+            retJson.push({insert: {image: newImgUrl}})
+          }
+        } else {
+          retJson.push(op)
+        }
+      }
+      return retJson
     },
 
     showMoveFolder () {
