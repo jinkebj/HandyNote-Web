@@ -151,14 +151,10 @@ export default {
     this.$bus.$on('updateNote', (noteData) => {
       for (let i = 0; i < this.listItems.length; i++) {
         if (this.listItems[i]._id === noteData._id) {
+          delete noteData.contents
+          let itemData = JSON.parse(JSON.stringify(noteData)) // deep copy
           this.listItems.splice(i, 1)
-          this.listItems.unshift({
-            _id: noteData._id,
-            name: noteData.name,
-            digest: noteData.digest,
-            folder_name: noteData.folder_name,
-            updated_at: noteData.updated_at
-          })
+          this.listItems.unshift(itemData)
           break
         }
       }
