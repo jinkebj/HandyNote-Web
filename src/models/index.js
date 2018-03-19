@@ -5,7 +5,7 @@ const Model = {}
 const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || HANDYNOTE_SERVICE_API
 
 Model.getStaticUrl = () => {
-  return BaseAPIUrl + '/handynote-static'
+  return BaseAPIUrl + '/images'
 }
 
 Model.getHttpPrototype = () => {

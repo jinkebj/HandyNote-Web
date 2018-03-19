@@ -280,6 +280,7 @@ export default {
         .then(function (response) {
           let contentsJson = (typeof response.data.contents === 'object' ? response.data.contents
             : JSON.parse(response.data.contents))
+
           self.quill.setContents(self.handleImgUrl(contentsJson))
           self.noteItem = response.data
           self.$bus.$emit('updateNote', response.data)
@@ -406,7 +407,8 @@ export default {
           !op.insert.image.startsWith('data:image') &&
           !op.insert.image.startsWith('http') &&
           !op.insert.image.startsWith('//')) {
-          op.insert.image = Model.getStaticUrl() + '/' + this.noteId + '/' + op.insert.image
+          op.insert.image = Model.getStaticUrl() + '/' + op.insert.image +
+            '?certId=' + window.localStorage.getItem('hn-token')
         }
       }
       return contentsJson
@@ -423,7 +425,9 @@ export default {
           if (op.insert.image.startsWith('data:image')) {
             retJson.push({insert: {image: await getResizedImgData(op.insert.image)}})
           } else {
-            let newImgUrl = op.insert.image.replace(Model.getStaticUrl() + '/' + this.noteId + '/', '')
+            let newImgUrl = op.insert.image.replace(Model.getStaticUrl() + '/', '')
+            let endIndex = newImgUrl.indexOf('?certId')
+            if (endIndex > 0) newImgUrl = newImgUrl.substring(0, endIndex)
             retJson.push({insert: {image: newImgUrl}})
           }
         } else {
