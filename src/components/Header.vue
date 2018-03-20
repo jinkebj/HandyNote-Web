@@ -1,6 +1,6 @@
 <template>
   <div class="header-container">
-    <el-button type="primary" icon="menu">
+    <el-button type="primary" icon="el-icon-menu">
       <span class="header-text-with-icon">Handy Note</span>
     </el-button>
 

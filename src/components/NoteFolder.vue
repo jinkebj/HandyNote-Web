@@ -19,7 +19,7 @@
 
     <div class="my-trash" :class="selectedFolderId === trashFolderId ? 'my-trash-selected' : 'my-trash-unselected'"
       @click="selectTrash">
-      <i class="el-icon-delete2"></i>
+      <i class="el-icon-delete my-trash-icon"></i>
       <span class="my-trash-name">Trash</span>
       <span class="my-trash-action">
         <el-dropdown trigger="click">
@@ -115,6 +115,11 @@
   flex-flow: row;
 }
 
+.my-trash-icon {
+  margin: 0;
+  padding: 2px 8px 0 0;
+}
+
 .my-trash-name {
   flex: 1;
 }
@@ -147,13 +152,13 @@
 }
 
 .folder-container .el-tree-node__content {
+  padding: 5px 0 5px 0;
   display: flex;
   flex-flow: row;
 }
 
-.folder-container .el-tree-node__expand-icon {
-  margin-top: 12px;
-  flex: 0;
+.folder-container .el-tree-node__content:hover {
+  background: #E5E9F2;
 }
 
 .my-folder-item {
@@ -195,12 +200,22 @@
   padding: 0px 10px;
 }
 
-.my-folder-form .el-dialog--small {
+.my-folder-form .el-dialog {
   width: 30%;
 }
 
 .my-folder-form .el-dialog__body {
-  padding: 20px 20px 10px 20px;
+  padding: 10px;
+  margin: 0 20px 0 20px;
+  border: 1px solid #ddd;
+}
+
+.my-folder-form .el-tree-node__content {
+  padding: 5px 0 5px 0;
+}
+
+.my-folder-form .el-tree-node__content:hover {
+  background: #E5E9F2;
 }
 </style>
 
@@ -287,7 +302,7 @@ export default {
       self.$prompt('Please input folder name', 'New Sub Folder', {
         confirmButtonText: 'Confirm',
         cancelButtonText: 'Cancel',
-        inputPattern: /[A-Za-z0-9_-]+/,
+        inputPattern: /^(?!\s*$).+/,
         inputErrorMessage: 'Invalid name!'
       }).then(({ value }) => {
         let newAncestorIds = data.ancestor_ids.concat([data.id])
@@ -309,6 +324,7 @@ export default {
             console.log(error)
             self.$message.error('Add folder failed!')
           })
+      }).catch(() => {
       })
     },
 
@@ -333,6 +349,7 @@ export default {
             console.log(error)
             self.$message.error('Move folder to trash failed!')
           })
+      }).catch(() => {
       })
     },
 
@@ -391,6 +408,7 @@ export default {
             console.log(error)
             self.$message.error('Rename folder failed!')
           })
+      }).catch(() => {
       })
     },
 

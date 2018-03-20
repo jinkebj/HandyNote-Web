@@ -269,6 +269,12 @@ export default {
     },
 
     async updateNote () {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Saving...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       const self = this
       let contentsJson = await this.handleImgResize(this.quill.getContents().ops)
 
@@ -283,6 +289,7 @@ export default {
 
           self.quill.setContents(self.handleImgUrl(contentsJson))
           self.noteItem = response.data
+          loading.close()
           self.$bus.$emit('updateNote', response.data)
           self.$message({
             message: 'Save note successfully!',
@@ -292,6 +299,7 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
+          loading.close()
           self.$message.error('Save note failed!')
         })
     },
