@@ -33,6 +33,8 @@
 }
 
 .list-count {
+  top: 0;
+  position: sticky;
   font-size: 14px;
   padding: 15px 15px;
   border-bottom: 1px solid #ddd;

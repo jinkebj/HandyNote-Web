@@ -1,6 +1,8 @@
 <template>
   <div class="folder-container">
-    <el-button class="my-action" @click="addNote">Compose</el-button>
+    <div class="my-action-container">
+      <el-button class="my-action" @click="addNote">Compose</el-button>
+    </div>
 
     <div class="my-recent" :class="selectedFolderId === recentFolderId ? 'my-recent-selected' : 'my-recent-unselected'"
       @click="selectRecent">
@@ -71,8 +73,16 @@
   color: #324057;
 }
 
+.my-action-container {
+  top: 0px;
+  position: sticky;
+  background: #F5F5F5;
+  display: flex;
+  justify-content: center;
+}
+
 .my-action {
-  flex: 0;
+  width: 100%;
   margin: 10px;
 }
 
