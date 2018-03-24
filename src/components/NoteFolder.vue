@@ -14,7 +14,7 @@
       <i class="el-icon-star-off"></i>Starred Notes
     </div>
 
-    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree"
+    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" indent="10"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
       @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
@@ -127,7 +127,7 @@
 
 .my-trash-icon {
   margin: 0;
-  padding: 2px 8px 0 0;
+  padding: 0 8px 0 0;
 }
 
 .my-trash-name {

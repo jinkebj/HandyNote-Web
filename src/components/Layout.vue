@@ -126,7 +126,7 @@ export default {
       } else if (viewType === '1') {
         this.split.setSizes([0, 0, 100])
       } else {
-        this.split.setSizes([12, 20, 68])
+        this.split.setSizes([17, 23, 60])
       }
       window.localStorage.setItem('hn-pane-sizes', JSON.stringify(self.split.getSizes()))
     })

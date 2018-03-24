@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="list-empty-hint" v-show="listItems.length === 0">
-      No notes
+      {{listPanelHint}}
     </div>
   </div>
 </template>
@@ -114,6 +114,7 @@ import {getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} 
 export default {
   data () {
     return {
+      listPanelHint: 'No notes',
       trashFolderId: getCurUsrTrashFolderId(),
       listItems: [],
       selectedItemId: '',
@@ -185,14 +186,18 @@ export default {
 
     loadNoteList (params) {
       const self = this
+      self.listItems = []
+      self.listPanelHint = 'Loading...'
       Model.getNoteList(params)
         .then(function (response) {
+          self.listPanelHint = 'No notes'
           self.listItems = response.data
           if (self.selectedItemId === '' && self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
           }
         })
         .catch(function (error) {
+          self.listPanelHint = 'No notes'
           console.log(error)
           self.$message.error('Failed to load note list!')
         })
