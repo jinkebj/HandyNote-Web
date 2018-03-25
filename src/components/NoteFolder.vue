@@ -14,7 +14,7 @@
       <i class="el-icon-star-off"></i>Starred Notes
     </div>
 
-    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" indent="10"
+    <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" :indent="10"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
       @node-click="selectFolder" :current-node-key="selectedFolderId">
     </el-tree>
