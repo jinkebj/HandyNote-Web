@@ -231,7 +231,7 @@
 
 <script>
 import Model from '@/models'
-import {prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
+import {getFolderRootItem, prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
@@ -240,15 +240,7 @@ export default {
       recentFolderId: getCurUsrRecentFolderId(),
       starFolderId: getCurUsrStarFolderId(),
       trashFolderId: getCurUsrTrashFolderId(),
-      noteFolders: [
-        {
-          type: 0,
-          id: getCurUsrRootFolderId(),
-          label: 'My Folders',
-          ancestor_ids: [],
-          children: []
-        }
-      ],
+      noteFolders: [getFolderRootItem()],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -299,7 +291,7 @@ export default {
       const self = this
       Model.getFolderList()
         .then(function (response) {
-          self.noteFolders = prepareFolderData(self.noteFolders[0], response.data)
+          self.noteFolders = prepareFolderData(response.data)
         })
         .catch(function (error) {
           console.log(error)
@@ -368,7 +360,7 @@ export default {
       self.selectedMoveToFolderId = ''
       Model.getFolderList({exclude_id: data.id})
         .then(function (response) {
-          self.moveToFolders = prepareFolderData(self.noteFolders[0], response.data)
+          self.moveToFolders = prepareFolderData(response.data)
         })
         .catch(function (error) {
           console.log(error)

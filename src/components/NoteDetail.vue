@@ -189,7 +189,7 @@
 
 <script>
 import Model from '@/models'
-import {HANDYNOTE_PROTOCOL, prepareFolderData, getCurUsrRootFolderId, getResizedImgData} from '@/util'
+import {HANDYNOTE_PROTOCOL, getFolderRootItem, prepareFolderData, getResizedImgData} from '@/util'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageResize } from '@/quill_modules/ImageResize'
@@ -202,13 +202,7 @@ export default {
       noteId: '',
       noteItem: {name: ''},
       originNoteName: '',
-      folderRoot: {
-        type: 0,
-        id: getCurUsrRootFolderId(),
-        label: 'My Folders',
-        ancestor_ids: [],
-        children: []
-      },
+      folderRoot: getFolderRootItem(),
       moveToFolders: [],
       showMoveToFolderForm: false,
       selectedMoveToFolderId: ''
@@ -451,7 +445,7 @@ export default {
       self.selectedMoveToFolderId = ''
       Model.getFolderList()
         .then(function (response) {
-          self.moveToFolders = prepareFolderData(self.folderRoot, response.data)
+          self.moveToFolders = prepareFolderData(response.data)
         })
         .catch(function (error) {
           console.log(error)

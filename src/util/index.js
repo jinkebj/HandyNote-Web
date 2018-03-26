@@ -4,14 +4,24 @@ import {maxUploadPicSize} from '@/../config'
 
 export * from '@/util/filters'
 
-export const prepareFolderData = (topItem, inputData) => {
-  if (typeof inputData !== 'object' || inputData.length === 0) return [topItem]
+export const getFolderRootItem = () => {
+  return {
+    type: 0,
+    id: getCurUsrRootFolderId(),
+    label: 'My Folders',
+    ancestor_ids: [],
+    children: []
+  }
+}
 
-  let rootItem = JSON.parse(JSON.stringify(topItem)) // deep copy
+export const prepareFolderData = (inputData) => {
+  if (typeof inputData !== 'object' || inputData.length === 0) return [getFolderRootItem()]
+
+  let rootItem = getFolderRootItem()
   rootItem.children = []
 
   let itemMap = new Map()
-  itemMap.set(topItem.id, rootItem)
+  itemMap.set(rootItem.id, rootItem)
 
   let maxLevel = 0
   let levelMap = new Map()
@@ -46,7 +56,7 @@ export const prepareFolderData = (topItem, inputData) => {
     })
   }
 
-  return [itemMap.get(topItem.id)]
+  return [itemMap.get(rootItem.id)]
 }
 
 const getImgObj = (url) => {
