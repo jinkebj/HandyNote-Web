@@ -106,6 +106,7 @@
 
       <div id="note-editor"></div>
     </div>
+
     <el-dialog class="my-folder-form" title="Please select destination folder:" :visible.sync="showMoveToFolderForm">
       <el-tree :data="moveToFolders" default-expand-all highlight-current :expand-on-click-node="false"
         @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
@@ -117,6 +118,20 @@
           Confirm
         </el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :visible.sync="showImgDetailView" center width="80%">
+      <div class="note-image-container">
+        <img :src="selectedImgUrl">
+      </div>
+      <span slot="footer">
+        <el-button-group>
+          <el-button icon="el-icon-plus"></el-button>
+          <el-button icon="el-icon-minus"></el-button>
+          <el-button icon="el-icon-refresh"></el-button>
+          <el-button icon="el-icon-download"></el-button>
+        </el-button-group>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -185,6 +200,11 @@
   color: #999;
   font-size: 20px;
 }
+
+.note-image-container {
+  display: flex;
+  justify-content: center;
+}
 </style>
 
 <script>
@@ -205,7 +225,9 @@ export default {
       folderRoot: getFolderRootItem(),
       moveToFolders: [],
       showMoveToFolderForm: false,
-      selectedMoveToFolderId: ''
+      selectedMoveToFolderId: '',
+      showImgDetailView: false,
+      selectedImgUrl: ''
     }
   },
 
@@ -227,7 +249,8 @@ export default {
         //   ['link', 'image']
         // ],
         imageResize: {
-          displaySize: true
+          displaySize: true,
+          eventBus: this.$bus
         }
       },
       theme: 'snow'
@@ -246,6 +269,11 @@ export default {
 
       if (this.editMode === true) this.toggleeditMode()
       this.loadNote()
+    })
+
+    this.$bus.$on('showImgDetail', (url) => {
+      this.selectedImgUrl = url
+      this.showImgDetailView = true
     })
   },
 

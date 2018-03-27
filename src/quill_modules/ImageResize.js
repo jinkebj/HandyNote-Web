@@ -37,6 +37,7 @@ export class ImageResize {
   }
 
   show (img) {
+    this.options.eventBus.$emit('showImgDetail', img.src)
     // keep track of this img element
     this.img = img
     this.showResizers()
