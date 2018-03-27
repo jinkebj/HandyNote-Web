@@ -212,7 +212,7 @@ import Model from '@/models'
 import {HANDYNOTE_PROTOCOL, getFolderRootItem, prepareFolderData, getResizedImgData} from '@/util'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
-import { ImageResize } from '@/quill_modules/ImageResize'
+import { ImageHandler } from '@/quill_modules/ImageHandler'
 
 export default {
   data () {
@@ -232,7 +232,7 @@ export default {
   },
 
   mounted () {
-    Quill.register('modules/imageResize', ImageResize)
+    Quill.register('modules/imageHandler', ImageHandler)
 
     this.quill = new Quill('#note-editor', {
       readOnly: true,
@@ -248,8 +248,7 @@ export default {
         //   / ['video'],
         //   ['link', 'image']
         // ],
-        imageResize: {
-          displaySize: true,
+        imageHandler: {
           eventBus: this.$bus
         }
       },
