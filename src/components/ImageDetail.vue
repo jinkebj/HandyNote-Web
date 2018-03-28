@@ -1,16 +1,22 @@
 <template>
   <div class="image-container">
     <el-button-group class="image-toolbar">
-      <el-button icon="el-icon-plus" @click="zoomIn"></el-button>
-      <el-button @click="resetZoom">1 : 1</el-button>
-      <el-button icon="el-icon-minus" @click="zoomOut"></el-button>
-      <el-button icon="el-icon-refresh" @click="rotateRight"></el-button>
+      <el-button icon="el-icon-view" v-show="editMode" @click="stop"></el-button>
+      <el-button icon="el-icon-edit" v-show="!editMode" @click="start"></el-button>
+      <el-button icon="el-icon-plus" v-show="editMode" @click="zoomIn"></el-button>
+      <el-button @click="resetZoom" v-show="editMode">1 : 1</el-button>
+      <el-button icon="el-icon-minus" v-show="editMode" @click="zoomOut"></el-button>
+      <el-button icon="el-icon-refresh" v-show="editMode" @click="rotateRight"></el-button>
     </el-button-group>
     <div class="image-wrapper">
-      <img ref="image" :src="src" @load="start">
+      <img ref="image" :src="src">
     </div>
   </div>
 </template>
+
+<style>
+
+</style>
 
 <style scoped>
 .image-container {
@@ -21,8 +27,8 @@
 }
 
 .image-toolbar {
-  margin-bottom: 18px;
-  z-index: 2015;
+  position: absolute;
+  top: 10px;
 }
 
 .image-wrapper {
@@ -30,12 +36,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  height: 100%;
-  & > img {
-    max-height: 100%;
-    max-width: 100%;
-  }
+.image-wrapper > img {
+  max-height: 100%;
+  max-width: 100%;
 }
 </style>
 
@@ -48,8 +53,13 @@ export default {
 
   data () {
     return {
-      cropper: null
+      cropper: null,
+      editMode: false
     }
+  },
+
+  watch: {
+    src: 'stop'
   },
 
   mounted () {
@@ -57,6 +67,7 @@ export default {
 
   methods: {
     start () {
+      this.editMode = true
       if (this.cropper !== null) this.cropper.destroy()
 
       this.cropper = new Cropper(this.$refs.image, {
@@ -67,6 +78,11 @@ export default {
         crop: ({detail}) => {
         }
       })
+    },
+
+    stop () {
+      this.editMode = false
+      if (this.cropper !== null) this.cropper.destroy()
     },
 
     zoomIn () {
