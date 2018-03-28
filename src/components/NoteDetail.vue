@@ -120,18 +120,8 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="showImgDetailView" center width="80%">
-      <div class="note-image-container">
-        <img :src="selectedImgUrl">
-      </div>
-      <span slot="footer">
-        <el-button-group>
-          <el-button icon="el-icon-plus"></el-button>
-          <el-button icon="el-icon-minus"></el-button>
-          <el-button icon="el-icon-refresh"></el-button>
-          <el-button icon="el-icon-download"></el-button>
-        </el-button-group>
-      </span>
+    <el-dialog :visible.sync="showImgDetailView" fullscreen>
+      <my-image-detail :src="selectedImgUrl"></my-image-detail>
     </el-dialog>
   </div>
 </template>
@@ -200,11 +190,6 @@
   color: #999;
   font-size: 20px;
 }
-
-.note-image-container {
-  display: flex;
-  justify-content: center;
-}
 </style>
 
 <script>
@@ -213,8 +198,13 @@ import {HANDYNOTE_PROTOCOL, getFolderRootItem, prepareFolderData, getResizedImgD
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageHandler } from '@/quill_modules/ImageHandler'
+import MyImageDetail from '@/components/ImageDetail'
 
 export default {
+  components: {
+    MyImageDetail
+  },
+
   data () {
     return {
       editMode: false,
