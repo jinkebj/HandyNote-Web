@@ -1,13 +1,22 @@
 <template>
   <div class="image-container">
-    <el-button-group class="image-toolbar">
+    <div class="image-toolbar">
       <el-button icon="el-icon-view" v-show="editMode" @click="stop"></el-button>
       <el-button icon="el-icon-edit" v-show="!editMode" @click="start"></el-button>
-      <el-button icon="el-icon-plus" v-show="editMode" @click="zoomIn"></el-button>
-      <el-button @click="resetZoom" v-show="editMode">1 : 1</el-button>
-      <el-button icon="el-icon-minus" v-show="editMode" @click="zoomOut"></el-button>
-      <el-button icon="el-icon-refresh" v-show="editMode" @click="rotateRight"></el-button>
-    </el-button-group>
+
+      <el-button-group v-show="editMode">
+        <el-button icon="el-icon-plus" @click="zoomIn"></el-button>
+        <el-button @click="resetZoom">1 : 1</el-button>
+        <el-button icon="el-icon-minus" @click="zoomOut"></el-button>
+        <el-button icon="el-icon-refresh" @click="rotateRight"></el-button>
+        <el-button icon="el-icon-news" v-show="!isEmbededImg && dragMode!=='crop'" @click="enterCrop"></el-button>
+      </el-button-group>
+
+      <el-button-group v-show="dragMode==='crop'">
+        <el-button icon="el-icon-circle-close-outline" @click="exitCrop"></el-button>
+        <el-button icon="el-icon-check" @click="crop"></el-button>
+      </el-button-group>
+  </div>
     <div class="image-wrapper">
       <img ref="image" :src="src">
     </div>
@@ -29,6 +38,11 @@
 .image-toolbar {
   position: absolute;
   top: 10px;
+
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .image-wrapper {
@@ -53,26 +67,44 @@ export default {
 
   data () {
     return {
+      imgSrc: this.src,
       cropper: null,
-      editMode: false
+      editMode: false,
+      dragMode: 'move'
+    }
+  },
+
+  computed: {
+    isEmbededImg () {
+      return this.src.startsWith('data:image')
+    },
+
+    getImgId () {
+      let startIndex = this.src.indexOf('/api/images/') + 12
+      let endIndex = this.src.indexOf('?certId')
+      return this.src.substring(startIndex, endIndex)
     }
   },
 
   watch: {
-    src: 'stop'
+    src: 'changeSrc'
   },
 
   mounted () {
   },
 
   methods: {
+    changeSrc () {
+      this.stop()
+    },
+
     start () {
       this.editMode = true
       if (this.cropper !== null) this.cropper.destroy()
 
       this.cropper = new Cropper(this.$refs.image, {
         autoCrop: false,
-        dragMode: 'move',
+        dragMode: this.dragMode,
         ready: () => {
         },
         crop: ({detail}) => {
@@ -82,6 +114,7 @@ export default {
 
     stop () {
       this.editMode = false
+      this.dragMode = 'move'
       if (this.cropper !== null) this.cropper.destroy()
     },
 
@@ -99,6 +132,21 @@ export default {
 
     rotateRight () {
       this.cropper.rotate(90)
+    },
+
+    enterCrop () {
+      this.dragMode = 'crop'
+      this.cropper.setDragMode(this.dragMode)
+    },
+
+    exitCrop () {
+      this.cropper.clear()
+      this.dragMode = 'move'
+      this.cropper.setDragMode(this.dragMode)
+    },
+
+    crop () {
+      this.src = this.cropper.getCroppedCanvas().toDataURL()
     }
   }
 }
