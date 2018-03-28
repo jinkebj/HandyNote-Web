@@ -12,16 +12,6 @@
   </div>
 </template>
 
-<style>
-.el-dialog.is-fullscreen {
-  background-color: rgba(255, 255, 255, 0.8)
-}
-
-.el-dialog__body .cropper-hidden {
-  display: none;
-}
-</style>
-
 <style scoped>
 .image-container {
   display: flex;
@@ -40,10 +30,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  height: 100%;
+  & > img {
+    max-height: 100%;
+    max-width: 100%;
+  }
 }
 </style>
 
 <script>
+import 'cropperjs/dist/cropper.css'
 import Cropper from 'cropperjs'
 
 export default {
