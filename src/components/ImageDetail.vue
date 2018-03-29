@@ -18,14 +18,10 @@
       </el-button-group>
   </div>
     <div class="image-wrapper">
-      <img ref="image" :src="src">
+      <img ref="image" :src="imgSrc">
     </div>
   </div>
 </template>
-
-<style>
-
-</style>
 
 <style scoped>
 .image-container {
@@ -61,33 +57,34 @@
 <script>
 import 'cropperjs/dist/cropper.css'
 import Cropper from 'cropperjs'
+import Model from '@/models'
 
 export default {
-  props: ['src'],
+  props: ['imgSrc'],
 
   data () {
     return {
-      imgSrc: this.src,
       cropper: null,
       editMode: false,
-      dragMode: 'move'
+      dragMode: 'move',
+      cropBoxData: null
     }
   },
 
   computed: {
     isEmbededImg () {
-      return this.src.startsWith('data:image')
+      return this.imgSrc.startsWith('data:image')
     },
 
     getImgId () {
-      let startIndex = this.src.indexOf('/api/images/') + 12
-      let endIndex = this.src.indexOf('?certId')
-      return this.src.substring(startIndex, endIndex)
+      let startIndex = this.imgSrc.indexOf('/api/images/') + 12
+      let endIndex = this.imgSrc.indexOf('?certId')
+      return this.imgSrc.substring(startIndex, endIndex)
     }
   },
 
   watch: {
-    src: 'changeSrc'
+    imgSrc: 'changeSrc'
   },
 
   mounted () {
@@ -104,11 +101,7 @@ export default {
 
       this.cropper = new Cropper(this.$refs.image, {
         autoCrop: false,
-        dragMode: this.dragMode,
-        ready: () => {
-        },
-        crop: ({detail}) => {
-        }
+        dragMode: this.dragMode
       })
     },
 
@@ -146,7 +139,23 @@ export default {
     },
 
     crop () {
-      this.src = this.cropper.getCroppedCanvas().toDataURL()
+      let self = this
+      self.cropBoxData = this.cropper.getCroppedCanvas().toDataURL('image/jpeg')
+
+      Model.updateImage(self.getImgId, {
+        data: self.cropBoxData
+      })
+        .then(function (response) {
+          self.$emit('updateImage', self.getImgId)
+          self.$message({
+            message: 'Image update successfully!',
+            type: 'success'
+          })
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Image update failed!')
+        })
     }
   }
 }

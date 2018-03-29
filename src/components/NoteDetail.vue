@@ -121,7 +121,7 @@
     </el-dialog>
 
     <el-dialog :visible.sync="showImgDetailView" fullscreen>
-      <my-image-detail :src="selectedImgUrl"></my-image-detail>
+      <my-image-detail :imgSrc="selectedImgUrl" @updateImage="handleUpdateImage($event)"></my-image-detail>
     </el-dialog>
   </div>
 </template>
@@ -526,6 +526,12 @@ export default {
           console.log(error)
           self.$message.error(hint + ' note failed!')
         })
+    },
+
+    handleUpdateImage (imgId) {
+      this.quill.setText('loading...')
+      this.loadNote()
+      this.showImgDetailView = false
     }
   }
 }

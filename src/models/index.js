@@ -36,6 +36,10 @@ Model.deleteNote = (id) => {
   return http.delete(BaseAPIUrl + '/notes/' + id)
 }
 
+Model.updateImage = (id, params) => {
+  return http.post(BaseAPIUrl + '/images/' + id, params)
+}
+
 Model.getFolderList = (params) => {
   return http.get(BaseAPIUrl + '/folders', { params: params })
 }
