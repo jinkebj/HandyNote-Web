@@ -141,12 +141,13 @@ export default {
     crop () {
       let self = this
       self.cropBoxData = this.cropper.getCroppedCanvas().toDataURL('image/jpeg')
+      self.stop()
 
       Model.updateImage(self.getImgId, {
         data: self.cropBoxData
       })
         .then(function (response) {
-          self.$emit('updateImage', self.getImgId)
+          self.$emit('updateImage')
           self.$message({
             message: 'Image update successfully!',
             type: 'success'

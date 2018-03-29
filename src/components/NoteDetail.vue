@@ -121,7 +121,7 @@
     </el-dialog>
 
     <el-dialog :visible.sync="showImgDetailView" fullscreen>
-      <my-image-detail :imgSrc="selectedImgUrl" @updateImage="handleUpdateImage($event)"></my-image-detail>
+      <my-image-detail :imgSrc="selectedImgUrl" @updateImage="handleUpdateImage"></my-image-detail>
     </el-dialog>
   </div>
 </template>
@@ -432,7 +432,9 @@ export default {
           op.insert.image.startsWith(HANDYNOTE_PROTOCOL)) {
           op.insert.image = op.insert.image.replace(HANDYNOTE_PROTOCOL, '')
           op.insert.image = Model.getStaticUrl() + '/' + op.insert.image +
-            '?certId=' + window.localStorage.getItem('hn-token')
+            '?certId=' + window.localStorage.getItem('hn-token') +
+            // to force browser reload image when note got updated
+            '&time=' + this.noteItem.updated_at
         }
       }
       return contentsJson
@@ -528,8 +530,7 @@ export default {
         })
     },
 
-    handleUpdateImage (imgId) {
-      this.quill.setText('loading...')
+    handleUpdateImage () {
       this.loadNote()
       this.showImgDetailView = false
     }
