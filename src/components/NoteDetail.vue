@@ -531,6 +531,8 @@ export default {
     },
 
     handleUpdateImage () {
+      this.noteItem.name = 'loading...'
+      this.quill.setText('loading...')
       this.loadNote()
       this.showImgDetailView = false
     }

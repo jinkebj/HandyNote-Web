@@ -1,21 +1,24 @@
 <template>
   <div class="image-container">
     <div class="image-toolbar">
-      <el-button icon="el-icon-view" v-show="editMode" @click="stop"></el-button>
-      <el-button icon="el-icon-edit" v-show="!editMode" @click="start"></el-button>
+      <el-button type="info" v-show="!editMode" @click="start">Edit Mode</el-button>
+      <el-button type="info" v-show="editMode" @click="stop">View Mode</el-button>
 
-      <el-button-group v-show="editMode">
+      <el-button-group class="image-tool-gap" v-show="editMode">
         <el-button icon="el-icon-plus" @click="zoomIn"></el-button>
         <el-button @click="resetZoom">1 : 1</el-button>
         <el-button icon="el-icon-minus" @click="zoomOut"></el-button>
-        <el-button icon="el-icon-refresh" @click="rotateRight"></el-button>
-        <el-button icon="el-icon-news" v-show="!isEmbededImg && dragMode!=='crop'" @click="enterCrop"></el-button>
       </el-button-group>
 
-      <el-button-group v-show="dragMode==='crop'">
-        <el-button icon="el-icon-circle-close-outline" @click="exitCrop"></el-button>
-        <el-button icon="el-icon-check" @click="crop"></el-button>
+      <el-button-group class="image-tool-gap" v-show="editMode">
+        <el-button @click="rotateRight">Rotate</el-button>
+        <el-button v-show="isHandyNoteProtocol && dragMode!=='crop'" @click="enterCrop">Crop</el-button>
+        <el-button v-show="dragMode==='crop'" @click="exitCrop">Cancel Crop</el-button>
       </el-button-group>
+
+      <el-button type="primary" class="image-tool-gap" v-show="isHandyNoteProtocol && editMode" @click="crop">
+        Save
+      </el-button>
   </div>
     <div class="image-wrapper">
       <img ref="image" :src="imgSrc">
@@ -39,6 +42,10 @@
   flex-flow: row;
   justify-content: center;
   align-items: center;
+}
+
+.image-tool-gap {
+  margin-left: 10px;
 }
 
 .image-wrapper {
@@ -72,8 +79,8 @@ export default {
   },
 
   computed: {
-    isEmbededImg () {
-      return this.imgSrc.startsWith('data:image')
+    isHandyNoteProtocol () {
+      return this.imgSrc.indexOf('/api/images/') >= 0 && this.imgSrc.indexOf('?certId') >= 0
     },
 
     getImgId () {
@@ -140,23 +147,28 @@ export default {
 
     crop () {
       let self = this
-      self.cropBoxData = this.cropper.getCroppedCanvas().toDataURL('image/jpeg')
-      self.stop()
-
-      Model.updateImage(self.getImgId, {
-        data: self.cropBoxData
-      })
-        .then(function (response) {
-          self.$emit('updateImage')
-          self.$message({
-            message: 'Image update successfully!',
-            type: 'success'
+      self.$confirm('Update image? This action can NOT be undone!', 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        self.cropBoxData = this.cropper.getCroppedCanvas().toDataURL('image/jpeg')
+        Model.updateImage(self.getImgId, {
+          data: self.cropBoxData
+        })
+          .then(function (response) {
+            self.stop()
+            self.$emit('updateImage')
+            self.$message({
+              message: 'Image update successfully!',
+              type: 'success'
+            })
           })
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.$message.error('Image update failed!')
-        })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Image update failed!')
+          })
+      })
     }
   }
 }
