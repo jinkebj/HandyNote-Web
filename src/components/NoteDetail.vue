@@ -130,6 +130,11 @@
 .el-dialog.is-fullscreen {
   background-color: rgba(255, 255, 255, 0.8)
 }
+.el-dialog__headerbtn .el-dialog__close {
+  font-size: 22px;
+  font-weight: 800;
+  color: #607d8b;
+}
 </style>
 
 <style scoped>

@@ -18,6 +18,7 @@ import {
   Icon,
   Row,
   Col,
+  Slider,
   Loading,
   MessageBox,
   Message
@@ -37,6 +38,7 @@ Vue.use(Tree)
 Vue.use(Icon)
 Vue.use(Row)
 Vue.use(Col)
+Vue.use(Slider)
 
 Vue.use(Loading.directive)
 

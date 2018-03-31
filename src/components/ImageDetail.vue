@@ -1,25 +1,28 @@
 <template>
   <div class="image-container">
     <div class="image-toolbar">
-      <el-button type="info" v-show="!editMode" @click="start">Edit Mode</el-button>
-      <el-button type="info" v-show="editMode" @click="stop">View Mode</el-button>
+      <el-button type="info" v-show="!editMode" @click="start">Edit</el-button>
 
       <el-button-group class="image-tool-gap" v-show="editMode">
-        <el-button icon="el-icon-plus" @click="zoomIn"></el-button>
-        <el-button @click="resetZoom">1 : 1</el-button>
-        <el-button icon="el-icon-minus" @click="zoomOut"></el-button>
+        <el-button size="mini" @click="rotateLeft"><i class="material-icons">rotate_left</i></el-button>
+        <el-button size="mini" @click="rotateRight"><i class="material-icons">rotate_right</i></el-button>
+        <el-button size="mini" v-show="isHandyNoteProtocol && dragMode!=='crop'" @click="enterCrop">
+          <i class="material-icons">crop</i>
+        </el-button>
+        <el-button size="mini" v-show="dragMode==='crop'" @click="exitCrop">
+          <i class="material-icons">highlight_off</i>
+        </el-button>
       </el-button-group>
 
-      <el-button-group class="image-tool-gap" v-show="editMode">
-        <el-button @click="rotateRight">Rotate</el-button>
-        <el-button v-show="isHandyNoteProtocol && dragMode!=='crop'" @click="enterCrop">Crop</el-button>
-        <el-button v-show="dragMode==='crop'" @click="exitCrop">Cancel Crop</el-button>
-      </el-button-group>
+      <el-slider ref="slider" class="image-tool-slider" v-show="editMode" v-model="zoomFactor" :step="10"
+        :min="20" :max="500" :format-tooltip="formatTooltip" @change="zoomChange($event)"></el-slider>
 
+      <el-button type="info" class="image-tool-gap" v-show="editMode" @click="stop">Cancel</el-button>
       <el-button type="primary" class="image-tool-gap" v-show="isHandyNoteProtocol && editMode" @click="crop">
         Save
       </el-button>
-  </div>
+    </div>
+
     <div class="image-wrapper">
       <img ref="image" :src="imgSrc">
     </div>
@@ -42,6 +45,11 @@
   flex-flow: row;
   justify-content: center;
   align-items: center;
+}
+
+.image-tool-slider {
+  width: 200px;
+  margin: 0 10px 0 20px;
 }
 
 .image-tool-gap {
@@ -74,7 +82,9 @@ export default {
       cropper: null,
       editMode: false,
       dragMode: 'move',
-      cropBoxData: null
+      cropBoxData: null,
+      zoomChecker: null,
+      zoomFactor: 100
     }
   },
 
@@ -95,9 +105,21 @@ export default {
   },
 
   mounted () {
+    let self = this
+    self.zoomChecker = function (event) {
+      if (event.detail.ratio > 5 || event.detail.ratio < 0.2) {
+        event.preventDefault() // Prevent zoom in / zoom out
+      } else {
+        self.zoomFactor = event.detail.ratio * 100
+      }
+    }
   },
 
   methods: {
+    formatTooltip (val) {
+      return (val || 100).toFixed(0) + '%'
+    },
+
     changeSrc () {
       this.stop()
     },
@@ -106,9 +128,13 @@ export default {
       this.editMode = true
       if (this.cropper !== null) this.cropper.destroy()
 
+      this.$refs.image.addEventListener('zoom', this.zoomChecker)
+      this.zoomFactor = 100
+
       this.cropper = new Cropper(this.$refs.image, {
         autoCrop: false,
-        dragMode: this.dragMode
+        dragMode: this.dragMode,
+        toggleDragModeOnDblclick: false
       })
     },
 
@@ -116,18 +142,15 @@ export default {
       this.editMode = false
       this.dragMode = 'move'
       if (this.cropper !== null) this.cropper.destroy()
+      this.$refs.image.removeEventListener('zoom', this.zoomChecker)
     },
 
-    zoomIn () {
-      this.cropper.zoom(0.1)
+    zoomChange (newValue) {
+      this.cropper.zoomTo(newValue / 100)
     },
 
-    zoomOut () {
-      this.cropper.zoom(-0.1)
-    },
-
-    resetZoom () {
-      this.cropper.zoomTo(1)
+    rotateLeft () {
+      this.cropper.rotate(-90)
     },
 
     rotateRight () {
