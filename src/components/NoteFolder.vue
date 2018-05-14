@@ -310,8 +310,7 @@ export default {
         let newAncestorIds = data.ancestor_ids.concat([data.id])
         Model.addFolder({
           name: value,
-          parent_id: data.id,
-          ancestor_ids: newAncestorIds
+          parent_id: data.id
         })
           .then(function (response) {
             self.$message({
