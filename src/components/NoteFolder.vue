@@ -16,7 +16,7 @@
 
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" :indent="10"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
-      @node-click="selectFolder" :current-node-key="selectedFolderId">
+      @node-click="selectFolder">
     </el-tree>
 
     <div class="my-trash" :class="selectedFolderId === trashFolderId ? 'my-trash-selected' : 'my-trash-unselected'"
@@ -276,6 +276,7 @@ export default {
       })
         .then(function (response) {
           self.selectAndRefresh(response.data.folder_id, response.data._id)
+          self.$refs.tree.setCurrentKey(response.data.folder_id)
           self.$message({
             message: 'Add note successfully!',
             type: 'success'
@@ -320,6 +321,7 @@ export default {
             store.append({ id: response.data._id, label: response.data.name, ancestor_ids: newAncestorIds, children: [] }, data)
             self.selectedFolderId = response.data._id
             self.selectAndRefresh(self.selectedFolderId, '')
+            self.$refs.tree.setCurrentKey(self.selectedFolderId)
           })
           .catch(function (error) {
             console.log(error)
@@ -345,6 +347,7 @@ export default {
             store.remove(data)
             self.selectedFolderId = data.ancestor_ids[data.ancestor_ids.length - 1]
             self.selectAndRefresh(self.selectedFolderId, '')
+            self.$refs.tree.setCurrentKey(self.selectedFolderId)
           })
           .catch(function (error) {
             console.log(error)
