@@ -1,8 +1,14 @@
 # HandyNote-Web
 
-> HandyNote - Web App
+> HandyNote Web Portal, utilize [HandyNote-Service](https://github.com/jinkebj/HandyNote-Service) as backend service provider
 
-## Build Setup
+- [Screenshot & HandyNote overall info](https://github.com/jinkebj/HandyNote)
+
+## Software Requirements
+
+- [Node.js 8.x or above](https://nodejs.org)
+
+## Development Setup
 
 ``` bash
 # Optional, set npm mirror to speed up npm install in China
@@ -13,6 +19,7 @@ npm install
 
 # Optional, set HANDYNOTE_WEB_PORT & HANDYNOTE_SERVICE_API
 # if not set, will use HANDYNOTE_WEB_PORT=9080, HANDYNOTE_SERVICE_API=http://localhost:3000/api
+# please refer to https://github.com/jinkebj/HandyNote-Service/blob/master/README.md to setup HandyNote-Service debug env
 export HANDYNOTE_WEB_PORT={portnum} # only apply for debug mode
 export HANDYNOTE_SERVICE_API=http://IP:Port/api
 
