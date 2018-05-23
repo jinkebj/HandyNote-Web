@@ -12,7 +12,7 @@ Model.getHttpPrototype = () => {
 }
 
 Model.login = (params) => {
-  return http.post(BaseAPIUrl + '/tokens/', params)
+  return http.post(BaseAPIUrl + '/tokens', params)
 }
 
 Model.getNoteList = (params) => {
@@ -20,7 +20,7 @@ Model.getNoteList = (params) => {
 }
 
 Model.addNote = (params) => {
-  return http.post(BaseAPIUrl + '/notes/', params)
+  return http.post(BaseAPIUrl + '/notes', params)
 }
 
 Model.getNote = (id) => {
@@ -44,7 +44,7 @@ Model.getFolderList = (params) => {
 }
 
 Model.addFolder = (params) => {
-  return http.post(BaseAPIUrl + '/folders/', params)
+  return http.post(BaseAPIUrl + '/folders', params)
 }
 
 Model.updateFolder = (id, params) => {
