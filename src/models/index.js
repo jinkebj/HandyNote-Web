@@ -1,8 +1,7 @@
 import http from 'axios'
-import {HANDYNOTE_SERVICE_API} from '@/../config'
 
 const Model = {}
-const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || HANDYNOTE_SERVICE_API
+const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || 'http://localhost:3000/api'
 
 Model.getStaticUrl = () => {
   return BaseAPIUrl + '/images'
