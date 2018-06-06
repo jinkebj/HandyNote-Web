@@ -127,6 +127,10 @@
 </template>
 
 <style>
+#note-container .ql-snow .ql-editor pre.ql-syntax { /* to avoid black background of code block*/
+  background-color: rgb(240, 240, 240);
+  color: #171313;
+}
 .el-dialog.is-fullscreen {
   background-color: rgba(255, 255, 255, 0.8)
 }
@@ -206,6 +210,8 @@
 <script>
 import Model from '@/models'
 import {HANDYNOTE_PROTOCOL, getFolderRootItem, prepareFolderData, getResizedImgData} from '@/util'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-light.css'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageHandler } from '@/quill_modules/ImageHandler'
@@ -249,6 +255,9 @@ export default {
         //   / ['video'],
         //   ['link', 'image']
         // ],
+        syntax: {
+          highlight: text => hljs.highlightAuto(text).value
+        },
         imageHandler: {
           eventBus: this.$bus
         }
