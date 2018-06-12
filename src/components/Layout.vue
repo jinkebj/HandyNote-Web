@@ -69,7 +69,7 @@
 
 .note-list:hover,
 .note-folder:hover {
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .note-detail {

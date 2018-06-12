@@ -112,8 +112,8 @@
         @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
       </el-tree>
       <div slot="footer">
-        <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
-        <el-button type="primary" @click="moveNote"
+        <el-button size="small" @click="showMoveToFolderForm = false">Cancel</el-button>
+        <el-button size="small" type="primary" @click="moveNote"
           :disabled="selectedMoveToFolderId === '' || selectedMoveToFolderId === noteItem.folder_id">
           Confirm
         </el-button>

@@ -49,8 +49,8 @@
         @node-click="selectMoveToFolder" :current-node-key="selectedMoveToFolderId">
       </el-tree>
       <div slot="footer">
-        <el-button @click="showMoveToFolderForm = false">Cancel</el-button>
-        <el-button type="primary" @click="moveFolder"
+        <el-button size="small" @click="showMoveToFolderForm = false">Cancel</el-button>
+        <el-button size="small" type="primary" @click="moveFolder"
           :disabled="selectedMoveToFolderId === ''">
           Confirm
         </el-button>
@@ -216,7 +216,7 @@
 
 .my-folder-form .el-dialog__body {
   padding: 10px;
-  margin: 0 20px 0 20px;
+  margin: 5px 20px 5px 20px;
   border: 1px solid #ddd;
 }
 
@@ -394,7 +394,7 @@ export default {
       self.$prompt('Please input folder name', 'Rename Folder', {
         confirmButtonText: 'Confirm',
         cancelButtonText: 'Cancel',
-        inputPattern: /[A-Za-z0-9_-]+/,
+        inputPattern: /^(?!\s*$).+/,
         inputErrorMessage: 'Invalid name!'
       }).then(({ value }) => {
         Model.updateFolder(data.id, {
