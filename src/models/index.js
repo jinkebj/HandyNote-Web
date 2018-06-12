@@ -19,6 +19,10 @@ Model.getNoteList = (params) => {
   return http.get(BaseAPIUrl + '/notes', { params: params })
 }
 
+Model.getNoteStatistics = (params) => {
+  return http.get(BaseAPIUrl + '/notes/statistics', { params: params })
+}
+
 Model.addNote = (params) => {
   return http.post(BaseAPIUrl + '/notes', params)
 }

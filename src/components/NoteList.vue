@@ -1,7 +1,7 @@
 <template>
   <div class="list-content">
     <div class="list-count" v-show="listItems.length > 0">
-      Count: {{listItems.length}}
+      Count: {{listCount}}
     </div>
     <div v-for="listItem in listItems">
       <div class="list-item" @click="selectItem(listItem)"
@@ -18,6 +18,9 @@
         </p>
         <h5 class="list-item-time">{{listItem.updated_at | fmtDate}} {{listItem.folder_name}}</h5>
       </div>
+    </div>
+    <div id="list-loader">
+      <i class="el-icon-loading" v-show="loadMoreFlag"></i>
     </div>
     <div class="list-empty-hint" v-show="listItems.length === 0">
       {{listPanelHint}}
@@ -105,18 +108,32 @@
   color: #999;
   font-size: 20px;
 }
+
+#list-loader .el-icon-loading {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
 </style>
 
 <script>
+import ScrollMagic from 'scrollmagic'
 import Model from '@/models'
 import {getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
+      limit: 20,
+      skip: 0,
+      loadMoreFlag: false,
+      listCount: 0,
       listPanelHint: 'No notes',
       trashFolderId: getCurUsrTrashFolderId(),
       listItems: [],
+      selectedFolderId: getCurUsrRecentFolderId(),
       selectedItemId: '',
       selectedItemType: 0 // 0: note, 1: folder
     }
@@ -134,20 +151,29 @@ export default {
   },
 
   mounted () {
-    this.loadNoteList()
+    let self = this
+
+    // init ScrollMagic
+    let controller = new ScrollMagic.Controller()
+    new ScrollMagic.Scene({triggerElement: '#list-loader', triggerHook: 'onEnter'})
+      .addTo(controller)
+      .on('enter', function (e) {
+        if (!self.loadMoreFlag && self.skip > 0 && self.listCount > self.skip) {
+          self.loadMoreFlag = true
+          self.loadNoteList(self.skip)
+        }
+      })
 
     this.$bus.$on('refreshNoteList', (selectedFolderId, selectedNoteId) => {
+      this.skip = 0
       this.selectedItemType = 0
       this.selectedItemId = selectedNoteId
+      this.selectedFolderId = selectedFolderId
 
-      if (selectedFolderId === getCurUsrRecentFolderId()) {
-        this.loadNoteList()
-      } else if (selectedFolderId === getCurUsrStarFolderId()) {
-        this.loadNoteList({ starred: 1 })
-      } else if (selectedFolderId === this.trashFolderId) {
+      if (selectedFolderId === this.trashFolderId) {
         this.loadTrash()
       } else {
-        this.loadNoteList({ folder_id: selectedFolderId })
+        this.loadNoteList(0)
       }
     })
 
@@ -167,6 +193,7 @@ export default {
       for (let i = 0; i < this.listItems.length; i++) {
         if (this.listItems[i]._id === noteId) {
           this.listItems.splice(i, 1)
+          this.listCount--
           break
         }
       }
@@ -176,6 +203,8 @@ export default {
         this.selectedItemId = ''
       }
     })
+
+    this.loadNoteList(0)
   },
 
   methods: {
@@ -184,15 +213,46 @@ export default {
       this.selectedItemType = (listItem.folder_name === undefined ? 1 : 0)
     },
 
-    loadNoteList (params) {
+    loadNoteList (skip) {
       const self = this
-      self.listItems = []
+      let params = {}
       self.listPanelHint = 'Loading...'
+
+      if (self.selectedFolderId === getCurUsrStarFolderId()) {
+        params.starred = 1
+      } else if (self.selectedFolderId !== getCurUsrRecentFolderId() && self.selectedFolderId !== undefined) {
+        params.folder_id = self.selectedFolderId
+      }
+
+      // only load notes statistics info when switch list
+      if (skip === 0) {
+        let statisticsParams = JSON.parse(JSON.stringify(params)) // deep copy
+        Model.getNoteStatistics(statisticsParams)
+          .then(function (ret) {
+            self.listCount = ret.data.count
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Failed to load note statistics info!')
+          })
+      }
+
+      params.skip = skip
+      params.limit = self.limit
       Model.getNoteList(params)
         .then(function (response) {
           self.listPanelHint = 'No notes'
-          self.listItems = response.data
-          if (self.selectedItemId === '' && self.listItems.length > 0) {
+
+          if (skip === 0) {
+            self.listItems = response.data
+          } else {
+            self.listItems.push(...response.data)
+          }
+
+          self.skip = self.listItems.length
+          self.loadMoreFlag = false
+
+          if (skip === 0 && self.selectedItemId === '' && self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
           }
         })
@@ -208,6 +268,7 @@ export default {
       Model.getTrash()
         .then(function (response) {
           self.listItems = response.data
+          self.listCount = self.listItems.length
           self.selectedItemId === ''
           if (self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
