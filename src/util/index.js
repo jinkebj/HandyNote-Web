@@ -110,6 +110,8 @@ export const getCurUsrId = () => { return window.localStorage.getItem('hn-user')
 
 export const getCurUsrRootFolderId = () => { return window.localStorage.getItem('hn-user') + '-Root' }
 
+export const getCurUsrSearchFolderId = () => { return window.localStorage.getItem('hn-user') + '-Search' }
+
 export const getCurUsrRecentFolderId = () => { return window.localStorage.getItem('hn-user') + '-Recent' }
 
 export const getCurUsrStarFolderId = () => { return window.localStorage.getItem('hn-user') + '-Starred' }

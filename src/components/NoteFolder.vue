@@ -4,12 +4,18 @@
       <el-button class="my-action" @click="addNote">Compose</el-button>
     </div>
 
-    <div class="my-recent" :class="selectedFolderId === recentFolderId ? 'my-recent-selected' : 'my-recent-unselected'"
+    <div class="my-fav-folder"
+      :class="selectedFolderId === searchFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
+      v-show="searchStr !== ''" @click="selectSearch(searchStr)">
+      <i class="el-icon-search"></i>Search: {{searchStr}}
+    </div>
+
+    <div class="my-fav-folder" :class="selectedFolderId === recentFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
       @click="selectRecent">
       <i class="el-icon-date"></i>Recent Notes
     </div>
 
-    <div class="my-starred" :class="selectedFolderId === starFolderId ? 'my-starred-selected' : 'my-starred-unselected'"
+    <div class="my-fav-folder" :class="selectedFolderId === starFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
       @click="selectStarred">
       <i class="el-icon-star-off"></i>Starred Notes
     </div>
@@ -86,22 +92,19 @@
   margin: 10px;
 }
 
-.my-recent,
-.my-starred {
+.my-fav-folder {
   flex: 0;
   padding: 10px 15px;
 }
 
-.my-recent-selected,
-.my-starred-selected,
+.my-fav-folder-selected,
 .my-trash-selected {
   cursor: pointer;
   background: #20A0FF;
   color: #FFFFFF;
 }
 
-.my-recent-unselected,
-.my-starred-unselected,
+.my-fav-folder-unselected,
 .my-trash-unselected {
   color: #324057;
 }
@@ -110,8 +113,7 @@
   color: #FFFFFF;
 }
 
-.my-recent-unselected:hover,
-.my-starred-unselected:hover,
+.my-fav-folder-unselected:hover,
 .my-trash-unselected:hover {
   cursor: pointer;
   background: #E5E9F2;
@@ -144,6 +146,7 @@
   display: inline-flex;
 }
 
+.folder-container .el-icon-search,
 .folder-container .el-icon-date,
 .folder-container .el-icon-star-off,
 .folder-container .el-icon-delete2 {
@@ -231,12 +234,14 @@
 
 <script>
 import Model from '@/models'
-import {getFolderRootItem, prepareFolderData, getCurUsrRootFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
+import {getFolderRootItem, prepareFolderData, getCurUsrRootFolderId, getCurUsrSearchFolderId, getCurUsrRecentFolderId,
+  getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
     return {
       rootFolderId: getCurUsrRootFolderId(),
+      searchFolderId: getCurUsrSearchFolderId(),
       recentFolderId: getCurUsrRecentFolderId(),
       starFolderId: getCurUsrStarFolderId(),
       trashFolderId: getCurUsrTrashFolderId(),
@@ -248,7 +253,8 @@ export default {
       moveToFolders: [],
       showMoveToFolderForm: false,
       selectedMoveToFolderId: '',
-      selectedFolderId: getCurUsrRecentFolderId()
+      selectedFolderId: getCurUsrRecentFolderId(),
+      searchStr: ''
     }
   },
 
@@ -258,6 +264,10 @@ export default {
     this.$bus.$on('refreshFolderList', (selectedFolderId) => {
       this.selectedFolderId = selectedFolderId
       this.loadFolderList()
+    })
+
+    this.$bus.$on('selectSearch', (searchStr) => {
+      this.selectSearch(searchStr)
     })
   },
 
@@ -427,6 +437,13 @@ export default {
     selectAndRefresh (selectedFolderId, selectedNoteId) {
       this.selectedFolderId = selectedFolderId
       this.$bus.$emit('refreshNoteList', selectedFolderId, selectedNoteId)
+    },
+
+    selectSearch (searchStr) {
+      this.searchStr = searchStr
+      this.selectedFolderId = this.searchFolderId
+      this.$refs.tree.store.setCurrentNode('')
+      this.$bus.$emit('searchNote', searchStr)
     },
 
     selectRecent () {

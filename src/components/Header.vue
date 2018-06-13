@@ -4,8 +4,8 @@
       <span class="header-text-with-icon">Handy Note</span>
     </el-button>
 
-    <el-input class="header-search" placeholder="Global Search" icon="search">
-    </el-input>
+    <el-input class="header-search" placeholder="Global Search" prefix-icon="el-icon-search"
+      v-model="searchStr" @keyup.enter.native="startSearch" />
 
     <div class="header-gap"></div>
 
@@ -20,21 +20,6 @@
         <i class="material-icons">web_asset</i>
       </el-radio-button>
     </el-radio-group>
-
-    <!-- <el-dropdown>
-      <el-button type="primary"><i class="material-icons">language</i></el-button>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">Automatic <i class="header-text-with-icon el-icon-check"></i></span>
-        </el-dropdown-item>
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">English</span>
-        </el-dropdown-item>
-        <el-dropdown-item class="my-folder-action-item">
-          <span class="my-folder-action-item-inner">Chinese</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown> -->
 
     <el-dropdown>
       <el-button type="primary">
@@ -120,6 +105,7 @@ import {getCurUsrId} from '@/util'
 export default {
   data () {
     return {
+      searchStr: '',
       loginUser: getCurUsrId(),
       viewType: -1 // -1: not initialized, 1: 1 column, 2: 2 columns, 3: 3 columns
     }
@@ -138,6 +124,10 @@ export default {
   },
 
   methods: {
+    startSearch () {
+      if (this.searchStr.length > 0) this.$bus.$emit('selectSearch', this.searchStr)
+    },
+
     initViewType () {
       let sizes = window.localStorage.getItem('hn-pane-sizes')
       if (sizes) {

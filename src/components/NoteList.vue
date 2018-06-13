@@ -121,7 +121,7 @@
 <script>
 import ScrollMagic from 'scrollmagic'
 import Model from '@/models'
-import {getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
+import {getCurUsrSearchFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
@@ -135,7 +135,8 @@ export default {
       listItems: [],
       selectedFolderId: getCurUsrRecentFolderId(),
       selectedItemId: '',
-      selectedItemType: 0 // 0: note, 1: folder
+      selectedItemType: 0, // 0: note, 1: folder
+      searchStr: ''
     }
   },
 
@@ -204,6 +205,14 @@ export default {
       }
     })
 
+    this.$bus.$on('searchNote', (searchStr) => {
+      this.skip = 0
+      this.selectedItemId = ''
+      this.selectedFolderId = getCurUsrSearchFolderId()
+      this.searchStr = searchStr
+      this.loadNoteList(0)
+    })
+
     this.loadNoteList(0)
   },
 
@@ -220,6 +229,8 @@ export default {
 
       if (self.selectedFolderId === getCurUsrStarFolderId()) {
         params.starred = 1
+      } else if (self.selectedFolderId === getCurUsrSearchFolderId()) {
+        params.search = self.searchStr
       } else if (self.selectedFolderId !== getCurUsrRecentFolderId() && self.selectedFolderId !== undefined) {
         params.folder_id = self.selectedFolderId
       }
