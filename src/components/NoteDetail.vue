@@ -215,6 +215,8 @@ import 'highlight.js/styles/atom-one-light.css'
 import 'quill/dist/quill.snow.css'
 import Quill from 'quill'
 import { ImageHandler } from '@/quill_modules/ImageHandler'
+import '@/quill_modules/quill.table.css'
+import TableHandler from '@/quill_modules/TableHandler'
 import MyImageDetail from '@/components/ImageDetail'
 
 export default {
@@ -240,6 +242,7 @@ export default {
 
   mounted () {
     Quill.register('modules/imageHandler', ImageHandler)
+    Quill.register('modules/tableHandler', TableHandler)
 
     this.quill = new Quill('#note-editor', {
       readOnly: true,
@@ -255,6 +258,19 @@ export default {
         //   / ['video'],
         //   ['link', 'image']
         // ],
+        clipboard: {
+          matchers: [
+            ['TD, TH', function (node, delta) {
+              delta.insert('\n', { td: true })
+              delta.insert({ tdbr: true })
+              return delta
+            }],
+            ['TR', function (node, delta) {
+              delta.insert({ trbr: true })
+              return delta
+            }]
+          ]
+        },
         syntax: {
           highlight: text => hljs.highlightAuto(text).value
         },
