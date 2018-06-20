@@ -100,3 +100,6 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+// disable inline table editing controls in firefox
+window.document.execCommand('enableInlineTableEditing', false, 'false')
