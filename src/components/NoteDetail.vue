@@ -4,7 +4,7 @@
       <i class="el-icon-document"></i>&nbsp;&nbsp;No content
     </div>
 
-    <div id="note-container" v-show="noteId !== ''">
+    <div id="note-container" v-show="noteId !== ''" :class="popupMode ? '' : 'note-container-height'">
       <div class="note-header">
         <input type="text" class="note-title" :readonly="!editMode" v-model="noteItem.name">
 
@@ -31,7 +31,7 @@
           </el-row>
         </el-popover>
 
-        <div class="note-controls">
+        <div class="note-controls" v-show="!popupMode">
           <el-button v-show="noteItem.deleted === 0 && !editMode" @click="toggleeditMode">Edit</el-button>
           <el-button v-show="editMode" @click="cancelUpdateNote">Cancel</el-button>
           <el-button v-show="editMode" @click="updateNote">Save</el-button>
@@ -56,6 +56,9 @@
               <i class="material-icons">more_vert</i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item class="my-folder-action-item">
+                <span class="my-folder-action-item-inner" @click="popup">Popup</span>
+              </el-dropdown-item>
               <el-dropdown-item class="my-folder-action-item">
                 <span class="my-folder-action-item-inner" @click="showMoveFolder">Move To</span>
               </el-dropdown-item>
@@ -142,7 +145,7 @@
 </style>
 
 <style scoped>
-#note-container {
+.note-container-height {
   height: calc(100vh - 110px);
 }
 
@@ -220,6 +223,8 @@ import TableHandler from '@/quill_modules/TableHandler'
 import MyImageDetail from '@/components/ImageDetail'
 
 export default {
+  props: ['id'],
+
   components: {
     MyImageDetail
   },
@@ -229,6 +234,7 @@ export default {
       editMode: false,
       quill: {},
       noteId: '',
+      popupMode: this.id !== undefined, // popup page for read only and print
       noteItem: {name: ''},
       originNoteName: '',
       folderRoot: getFolderRootItem(),
@@ -300,6 +306,11 @@ export default {
       this.selectedImgUrl = url
       this.showImgDetailView = true
     })
+
+    if (this.popupMode) {
+      this.noteId = this.id
+      this.loadNote()
+    }
   },
 
   methods: {
@@ -568,6 +579,10 @@ export default {
       this.quill.setText('loading...')
       this.loadNote()
       this.showImgDetailView = false
+    },
+
+    popup () {
+      window.open('./#/notes/' + this.noteId, '_blank')
     }
   }
 }
