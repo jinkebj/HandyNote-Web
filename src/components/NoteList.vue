@@ -29,6 +29,11 @@
 </template>
 
 <style scoped>
+.list-content {
+  position: relative; /* needed for perfert-scrollbar */
+  height: 100%; /* needed for perfert-scrollbar */
+}
+
 .list-content a {
   text-decoration: none;
   outline: none;
@@ -119,6 +124,8 @@
 </style>
 
 <script>
+import 'perfect-scrollbar/css/perfect-scrollbar.css'
+import PerfectScrollbar from 'perfect-scrollbar'
 import ScrollMagic from 'scrollmagic'
 import Model from '@/models'
 import {getCurUsrSearchFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
@@ -136,7 +143,9 @@ export default {
       selectedFolderId: getCurUsrRecentFolderId(),
       selectedItemId: '',
       selectedItemType: 0, // 0: note, 1: folder
-      searchStr: ''
+      searchStr: '',
+      scrollBar: {},
+      scrollContainer: {}
     }
   },
 
@@ -153,6 +162,12 @@ export default {
 
   mounted () {
     let self = this
+
+    // init perfect-scrollbar
+    self.scrollContainer = document.querySelector('.list-content')
+    self.scrollBar = new PerfectScrollbar(self.scrollContainer, {
+      suppressScrollX: true
+    })
 
     // init ScrollMagic
     let controller = new ScrollMagic.Controller()
@@ -255,6 +270,7 @@ export default {
           self.listPanelHint = 'No notes'
 
           if (skip === 0) {
+            self.scrollContainer.scrollTop = 0
             self.listItems = response.data
           } else {
             self.listItems.push(...response.data)
@@ -266,6 +282,10 @@ export default {
           if (skip === 0 && self.selectedItemId === '' && self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
           }
+
+          setTimeout(function () {
+            self.scrollBar.update()
+          }, 100)
         })
         .catch(function (error) {
           self.listPanelHint = 'No notes'
@@ -278,12 +298,17 @@ export default {
       const self = this
       Model.getTrash()
         .then(function (response) {
+          self.scrollContainer.scrollTop = 0
           self.listItems = response.data
           self.listCount = self.listItems.length
           self.selectedItemId === ''
           if (self.listItems.length > 0) {
             self.selectItem(self.listItems[0])
           }
+
+          setTimeout(function () {
+            self.scrollBar.update()
+          }, 100)
         })
         .catch(function (error) {
           console.log(error)
