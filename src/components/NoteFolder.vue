@@ -22,7 +22,7 @@
 
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" :indent="10"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
-      @node-click="selectFolder">
+      @node-click="selectFolder" @node-expand="updateScrollBar" @node-collapse="updateScrollBar">
     </el-tree>
 
     <div class="my-trash" :class="selectedFolderId === trashFolderId ? 'my-trash-selected' : 'my-trash-unselected'"
@@ -68,8 +68,8 @@
 <style scoped>
 .folder-container {
   font-size: 14px;
-  display: flex;
-  flex-flow: column;
+  position: relative; /* needed for perfert-scrollbar */
+  height: 100%; /* needed for perfert-scrollbar */
 }
 
 .my-folder {
@@ -89,7 +89,7 @@
 
 .my-action {
   width: 100%;
-  margin: 10px;
+  margin: 10px 20px;
 }
 
 .my-fav-folder {
@@ -233,6 +233,8 @@
 </style>
 
 <script>
+import 'perfect-scrollbar/css/perfect-scrollbar.css'
+import PerfectScrollbar from 'perfect-scrollbar'
 import Model from '@/models'
 import {getFolderRootItem, prepareFolderData, getCurUsrRootFolderId, getCurUsrSearchFolderId, getCurUsrRecentFolderId,
   getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
@@ -254,11 +256,17 @@ export default {
       showMoveToFolderForm: false,
       selectedMoveToFolderId: '',
       selectedFolderId: getCurUsrRecentFolderId(),
-      searchStr: ''
+      searchStr: '',
+      scrollBar: {}
     }
   },
 
   mounted () {
+    // init perfect-scrollbar
+    this.scrollBar = new PerfectScrollbar(document.querySelector('.folder-container'), {
+      suppressScrollX: true
+    })
+
     this.loadFolderList()
 
     this.$bus.$on('refreshFolderList', (selectedFolderId) => {
@@ -303,6 +311,9 @@ export default {
       Model.getFolderList()
         .then(function (response) {
           self.noteFolders = prepareFolderData(response.data)
+          setTimeout(function () {
+            self.scrollBar.update()
+          }, 100)
         })
         .catch(function (error) {
           console.log(error)
@@ -510,6 +521,13 @@ export default {
             self.$message.error('Restore trash failed!')
           })
       })
+    },
+
+    updateScrollBar () {
+      let self = this
+      setTimeout(function () {
+        self.scrollBar.update()
+      }, 500)
     },
 
     renderContent (h, { node, data, store }) {
