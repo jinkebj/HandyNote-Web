@@ -138,7 +138,7 @@ export default {
       if (sizes) {
         sizes = JSON.parse(sizes)
       } else {
-        sizes = [12, 16, 72]  // default pane size
+        sizes = [17, 23, 60]  // default pane size
       }
       return sizes
     }

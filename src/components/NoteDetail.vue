@@ -345,8 +345,11 @@ export default {
           let contentsJson = (typeof response.data.contents === 'object' ? response.data.contents
             : JSON.parse(response.data.contents))
 
-          // self.quill.setContents(self.handleImgUrl(contentsJson))
-          loadContentWithDelta(self.quill, self.handleImgUrl(contentsJson))
+          // make sure UI rendering threads catch up
+          setTimeout(function () {
+            loadContentWithDelta(self.quill, self.handleImgUrl(contentsJson))
+          }, 0)
+
           self.noteItem = response.data
           loading.close()
           self.$bus.$emit('updateNote', response.data)
@@ -373,8 +376,10 @@ export default {
           type: 'warning'
         }).then(() => {
           self.noteItem.name = self.originNoteName
-          // self.quill.setContents(self.noteItem.contents)
-          loadContentWithDelta(self.quill, self.noteItem.contents)
+          // make sure UI rendering threads catch up
+          setTimeout(function () {
+            loadContentWithDelta(self.quill, self.noteItem.contents)
+          }, 0)
           self.toggleeditMode()
         })
       } else {
@@ -451,7 +456,7 @@ export default {
 
           let contentsJson = (typeof response.data.contents === 'object' ? response.data.contents
             : JSON.parse(response.data.contents))
-          // self.quill.setContents(self.handleImgUrl(contentsJson))
+          // load content by page per need
           loadContentWithDelta(self.quill, self.handleImgUrl(contentsJson))
 
           // go to edit mode if the note is newly created
