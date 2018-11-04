@@ -3,8 +3,12 @@ import http from 'axios'
 const Model = {}
 const BaseAPIUrl = process.env.HANDYNOTE_SERVICE_API || 'http://localhost:3000/api'
 
-Model.getStaticUrl = () => {
+Model.getBaseImgUrl = () => {
   return BaseAPIUrl + '/images'
+}
+
+Model.getBaseAttachUrl = () => {
+  return BaseAPIUrl + '/attachments'
 }
 
 Model.getHttpPrototype = () => {
@@ -41,6 +45,14 @@ Model.deleteNote = (id) => {
 
 Model.updateImage = (id, params) => {
   return http.post(BaseAPIUrl + '/images/' + id, params)
+}
+
+Model.getAttachmentList = (params) => {
+  return http.get(BaseAPIUrl + '/attachments', { params: params })
+}
+
+Model.deleteAttachment = (id) => {
+  return http.delete(BaseAPIUrl + '/attachments/' + id)
 }
 
 Model.getFolderList = (params) => {

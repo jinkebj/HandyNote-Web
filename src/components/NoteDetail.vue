@@ -12,7 +12,7 @@
           ref="noteMetaData"
           placement="bottom"
           width="260"
-          trigger="hover">
+          trigger="click">
           <el-row>
             <el-col :span="12"><div class="note-meta-info">Name:</div></el-col>
             <el-col :span="12"><div class="note-meta-info">{{noteItem.name}}</div></el-col>
@@ -31,6 +31,28 @@
           </el-row>
         </el-popover>
 
+        <el-popover
+          ref="noteAttachment"
+          placement="bottom"
+          width="260"
+          trigger="click">
+          <el-upload
+            action="http://localhost:3000/api/attachments"
+            list-type="text"
+            :multiple=true
+            :limit=5
+            :file-list="attachmentList"
+            :headers="getUploadHeaders()"
+            :data="getUploadExtraData()"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :on-error="handleUploadError"
+            :before-remove="beforeRemove"
+            :on-exceed="handleExceed">
+            <el-button size="small">Upload File</el-button>
+          </el-upload>
+        </el-popover>
+
         <div class="note-controls" v-show="!popupMode">
           <el-button v-show="noteItem.deleted === 0 && !editMode" @click="toggleeditMode">Edit</el-button>
           <el-button v-show="editMode" @click="cancelUpdateNote">Cancel</el-button>
@@ -42,6 +64,9 @@
             </el-button>
             <el-button class="note-controls-icon" v-popover:noteMetaData v-show="noteItem.deleted === 0">
               <i class="material-icons">info_outline</i>
+            </el-button>
+            <el-button class="note-controls-icon" v-popover:noteAttachment v-show="noteItem.deleted === 0">
+              <i class="material-icons">attach_file</i>
             </el-button>
             <el-button class="note-controls-icon" @click="restoreItem" v-show="noteItem.deleted === 1">
               <i class="material-icons">restore</i>
@@ -171,7 +196,7 @@
 }
 
 .note-controls {
-  flex: 0 320px;
+  flex: 0 360px;
 
   display: flex;
   flex-flow: row;
@@ -242,7 +267,8 @@ export default {
       showMoveToFolderForm: false,
       selectedMoveToFolderId: '',
       showImgDetailView: false,
-      selectedImgUrl: ''
+      selectedImgUrl: '',
+      attachmentList: []
     }
   },
 
@@ -314,6 +340,62 @@ export default {
   },
 
   methods: {
+    getUploadHeaders () {
+      return {
+        'X-Auth-Token': window.localStorage.getItem('hn-token')
+      }
+    },
+    getUploadExtraData () {
+      return {
+        note_id: this.noteId
+      }
+    },
+
+    handleRemove (file, fileList) {
+      let self = this
+      const attachmentId = file._id || file.response._id
+      Model.deleteAttachment(attachmentId)
+        .then(function (response) {
+          self.$message({
+            message: 'Delete attachment successfully!',
+            type: 'success'
+          })
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Delete attachment failed!')
+        })
+    },
+
+    handleUploadError (err, file, fileList) {
+      this.$message.warning('Upload file failed! ' + err)
+    },
+
+    handlePreview (file) {
+      const attachmentId = file._id || file.response._id
+      window.location.href = Model.getBaseAttachUrl() + '/' + attachmentId + '?certId=' + window.localStorage.getItem('hn-token')
+    },
+
+    handleExceed (files, fileList) {
+      this.$message.warning('Reach max file limit!')
+    },
+
+    // beforeUpload (file) {
+    //   const isLt16M = file.size / 1024 / 1024 < 16
+    //   if (!isLt16M) {
+    //     this.$message.error('Exceed max file size limit 16MB!')
+    //   }
+    //   return isLt16M
+    // },
+
+    beforeRemove (file, fileList) {
+      return this.$confirm(`Delete ${file.name}? This action can NOT be undone!`, 'Please Confirm', {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        type: 'warning'
+      })
+    },
+
     toggleeditMode () {
       this.editMode = !this.editMode
       this.quill.enable(this.editMode)
@@ -469,6 +551,19 @@ export default {
           console.log(error)
           self.$message.error('Failed to load note!')
         })
+      self.loadAttachmentList()
+    },
+
+    loadAttachmentList () {
+      const self = this
+      Model.getAttachmentList({note_id: self.noteId})
+        .then(function (response) {
+          self.attachmentList = response.data
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Failed to load attachment list!')
+        })
     },
 
     handleImgUrl (contentsJson) {
@@ -480,7 +575,7 @@ export default {
           typeof op.insert.image === 'string' &&
           op.insert.image.startsWith(HANDYNOTE_PROTOCOL)) {
           op.insert.image = op.insert.image.replace(HANDYNOTE_PROTOCOL, '')
-          op.insert.image = Model.getStaticUrl() + '/' + op.insert.image +
+          op.insert.image = Model.getBaseImgUrl() + '/' + op.insert.image +
             '?certId=' + window.localStorage.getItem('hn-token') +
             // to force browser reload image when note got updated
             '&time=' + this.noteItem.updated_at
@@ -499,8 +594,8 @@ export default {
           typeof op.insert.image === 'string') {
           if (op.insert.image.startsWith('data:image')) {
             retJson.push({insert: {image: await getResizedImgData(op.insert.image)}})
-          } else if (op.insert.image.startsWith(Model.getStaticUrl() + '/')) {
-            let newImgUrl = op.insert.image.replace(Model.getStaticUrl() + '/', '')
+          } else if (op.insert.image.startsWith(Model.getBaseImgUrl() + '/')) {
+            let newImgUrl = op.insert.image.replace(Model.getBaseImgUrl() + '/', '')
             let endIndex = newImgUrl.indexOf('?certId')
             if (endIndex > 0) newImgUrl = newImgUrl.substring(0, endIndex)
             retJson.push({insert: {image: HANDYNOTE_PROTOCOL + newImgUrl}})
