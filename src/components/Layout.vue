@@ -103,7 +103,7 @@ export default {
 
     this.split = Split(['.note-folder', '.note-list', '.note-detail'], {
       sizes: self.getPaneSize(),
-      minSize: [150, 200, 400],
+      minSize: [0, 0, 400],
       gutterSize: 0,
       elementStyle: function (dimension, size, gutterSize) {
         return {

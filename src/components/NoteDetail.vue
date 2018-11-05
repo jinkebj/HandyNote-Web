@@ -34,16 +34,17 @@
         <el-popover
           ref="noteAttachment"
           placement="bottom"
-          width="260"
+          width="360"
           trigger="click">
           <el-upload
-            action="http://localhost:3000/api/attachments"
             list-type="text"
+            :action="getUploadUrl()"
             :multiple=true
-            :limit=5
+            :limit=20
             :file-list="attachmentList"
             :headers="getUploadHeaders()"
             :data="getUploadExtraData()"
+            :on-success="handleUploadSuccess"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :on-error="handleUploadError"
@@ -66,7 +67,7 @@
               <i class="material-icons">info_outline</i>
             </el-button>
             <el-button class="note-controls-icon" v-popover:noteAttachment v-show="noteItem.deleted === 0">
-              <i class="material-icons">attach_file</i>
+              <i class="material-icons">attach_file</i>{{attachmentCount > 0 ? attachmentCount : ''}}
             </el-button>
             <el-button class="note-controls-icon" @click="restoreItem" v-show="noteItem.deleted === 1">
               <i class="material-icons">restore</i>
@@ -268,7 +269,8 @@ export default {
       selectedMoveToFolderId: '',
       showImgDetailView: false,
       selectedImgUrl: '',
-      attachmentList: []
+      attachmentList: [],
+      attachmentCount: 0
     }
   },
 
@@ -340,11 +342,16 @@ export default {
   },
 
   methods: {
+    getUploadUrl () {
+      return Model.getBaseAttachUrl()
+    },
+
     getUploadHeaders () {
       return {
         'X-Auth-Token': window.localStorage.getItem('hn-token')
       }
     },
+
     getUploadExtraData () {
       return {
         note_id: this.noteId
@@ -356,6 +363,7 @@ export default {
       const attachmentId = file._id || file.response._id
       Model.deleteAttachment(attachmentId)
         .then(function (response) {
+          self.attachmentCount = fileList.length
           self.$message({
             message: 'Delete attachment successfully!',
             type: 'success'
@@ -365,6 +373,10 @@ export default {
           console.log(error)
           self.$message.error('Delete attachment failed!')
         })
+    },
+
+    handleUploadSuccess (response, file, fileList) {
+      this.attachmentCount = fileList.length
     },
 
     handleUploadError (err, file, fileList) {
@@ -559,6 +571,7 @@ export default {
       Model.getAttachmentList({note_id: self.noteId})
         .then(function (response) {
           self.attachmentList = response.data
+          self.attachmentCount = self.attachmentList.length
         })
         .catch(function (error) {
           console.log(error)

@@ -3,7 +3,7 @@
     <div class="list-count" v-show="listItems.length > 0">
       Count: {{listCount}}
     </div>
-    <div v-for="listItem in listItems">
+    <div v-for="listItem in listItems" :key="listItem._id">
       <div class="list-item" @click="selectItem(listItem)"
         :class="selectedItemId === listItem._id ? 'list-item-selected' : 'list-item-unselected'">
         <h4 class="list-item-subject">

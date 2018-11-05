@@ -23,11 +23,13 @@ html, body {
 ::-webkit-scrollbar-thumb:vertical {
   background: rgba(0, 0, 0, 0.2);
   -webkit-border-radius: 100px;
+  border-radius: 100px;
 }
 
 ::-webkit-scrollbar-thumb:vertical:hover {
   background: rgba(0, 0, 0, 0.35);
   -webkit-border-radius: 100px;
+  border-radius: 100px;
 }
 </style>
 
