@@ -138,7 +138,8 @@ import 'perfect-scrollbar/css/perfect-scrollbar.css'
 import PerfectScrollbar from 'perfect-scrollbar'
 import ScrollMagic from 'scrollmagic'
 import Model from '@/models'
-import {getCurUsrSearchFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
+import {getCurUsrSearchFolderId, getCurUsrRecentFolderId, getCurUsrStarFolderId,
+  getCurUsrAttachFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
@@ -254,6 +255,8 @@ export default {
 
       if (self.selectedFolderId === getCurUsrStarFolderId()) {
         params.starred = 1
+      } else if (self.selectedFolderId === getCurUsrAttachFolderId()) {
+        params.has_attachment = true
       } else if (self.selectedFolderId === getCurUsrSearchFolderId()) {
         params.search = self.searchStr
       } else if (self.selectedFolderId !== getCurUsrRecentFolderId() && self.selectedFolderId !== undefined) {

@@ -4,20 +4,40 @@
       <el-button class="my-action" @click="addNote">Compose</el-button>
     </div>
 
-    <div class="my-fav-folder"
-      :class="selectedFolderId === searchFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
+    <div class="my-folder-common"
+      :class="selectedFolderId === searchFolderId ? 'my-folder-common-selected' : 'my-folder-common-unselected'"
       v-show="searchStr !== ''" @click="selectSearch(searchStr)">
       <i class="el-icon-search"></i>Search: {{searchStr}}
     </div>
 
-    <div class="my-fav-folder" :class="selectedFolderId === recentFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
-      @click="selectRecent">
+    <div class="my-folder-common" :class="selectedFolderId === recentFolderId ? 'my-folder-common-selected' : 'my-folder-common-unselected'"
+      @click="selectSysFolder(recentFolderId)">
       <i class="el-icon-date"></i>Recent Notes
     </div>
 
-    <div class="my-fav-folder" :class="selectedFolderId === starFolderId ? 'my-fav-folder-selected' : 'my-fav-folder-unselected'"
-      @click="selectStarred">
+    <div class="my-folder-common" :class="selectedFolderId === starFolderId ? 'my-folder-common-selected' : 'my-folder-common-unselected'"
+      @click="selectSysFolder(starFolderId)">
       <i class="el-icon-star-off"></i>Starred Notes
+    </div>
+
+    <div class="my-folder-adv" :class="selectedFolderId === attachFolderId ? 'my-folder-adv-selected' : 'my-folder-adv-unselected'"
+      @click="selectSysFolder(attachFolderId)">
+      <i class="material-icons my-attachment-icon">attachment</i>
+      <span class="my-folder-adv-name">Attachments</span>
+      <span class="my-folder-adv-action">
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link">
+            <i class="el-icon-setting el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item class="my-folder-action-item">
+              <span class="my-folder-action-item-inner" @click="emptyTrash">
+                Show All Attachment
+              </span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </span>
     </div>
 
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" :indent="10"
@@ -25,11 +45,11 @@
       @node-click="selectFolder" @node-expand="updateScrollBar" @node-collapse="updateScrollBar">
     </el-tree>
 
-    <div class="my-trash" :class="selectedFolderId === trashFolderId ? 'my-trash-selected' : 'my-trash-unselected'"
-      @click="selectTrash">
-      <i class="el-icon-delete my-trash-icon"></i>
-      <span class="my-trash-name">Trash</span>
-      <span class="my-trash-action">
+    <div class="my-folder-adv" :class="selectedFolderId === trashFolderId ? 'my-folder-adv-selected' : 'my-folder-adv-unselected'"
+      @click="selectSysFolder(trashFolderId)">
+      <i class="el-icon-delete my-folder-adv-icon"></i>
+      <span class="my-folder-adv-name">Trash</span>
+      <span class="my-folder-adv-action">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link">
             <i class="el-icon-setting el-icon--right"></i>
@@ -92,34 +112,39 @@
   margin: 10px 20px;
 }
 
-.my-fav-folder {
+.my-folder-common {
   flex: 0;
   padding: 10px 15px;
 }
 
-.my-fav-folder-selected,
-.my-trash-selected {
+.my-attachment-icon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.my-folder-common-selected,
+.my-folder-adv-selected {
   cursor: pointer;
   background: #20A0FF;
   color: #FFFFFF;
 }
 
-.my-fav-folder-unselected,
-.my-trash-unselected {
+.my-folder-common-unselected,
+.my-folder-adv-unselected {
   color: #324057;
 }
 
-.my-trash-selected .el-icon-setting {
+.my-folder-adv-selected .el-icon-setting {
   color: #FFFFFF;
 }
 
-.my-fav-folder-unselected:hover,
-.my-trash-unselected:hover {
+.my-folder-common-unselected:hover,
+.my-folder-adv-unselected:hover {
   cursor: pointer;
   background: #E5E9F2;
 }
 
-.my-trash {
+.my-folder-adv {
   flex: 0;
   padding: 10px 15px;
 
@@ -127,22 +152,22 @@
   flex-flow: row;
 }
 
-.my-trash-icon {
+.my-folder-adv-icon {
   margin: 0;
   padding: 0 8px 0 0;
 }
 
-.my-trash-name {
+.my-folder-adv-name {
   flex: 1;
 }
 
-.my-trash-action {
+.my-folder-adv-action {
   flex: 0 15px;
   align-self: flex-end;
   display: none;
 }
 
-.my-trash:hover .my-trash-action {
+.my-folder-adv:hover .my-folder-adv-action {
   display: inline-flex;
 }
 
@@ -237,7 +262,7 @@ import 'perfect-scrollbar/css/perfect-scrollbar.css'
 import PerfectScrollbar from 'perfect-scrollbar'
 import Model from '@/models'
 import {getFolderRootItem, prepareFolderData, getCurUsrRootFolderId, getCurUsrSearchFolderId, getCurUsrRecentFolderId,
-  getCurUsrStarFolderId, getCurUsrTrashFolderId} from '@/util'
+  getCurUsrStarFolderId, getCurUsrAttachFolderId, getCurUsrTrashFolderId} from '@/util'
 
 export default {
   data () {
@@ -246,6 +271,7 @@ export default {
       searchFolderId: getCurUsrSearchFolderId(),
       recentFolderId: getCurUsrRecentFolderId(),
       starFolderId: getCurUsrStarFolderId(),
+      attachFolderId: getCurUsrAttachFolderId(),
       trashFolderId: getCurUsrTrashFolderId(),
       noteFolders: [getFolderRootItem()],
       defaultProps: {
@@ -284,6 +310,7 @@ export default {
       const self = this
       if (self.selectedFolderId === self.recentFolderId ||
         self.selectedFolderId === self.starFolderId ||
+        self.selectedFolderId === self.attachFolderId ||
         self.selectedFolderId === self.trashFolderId) {
         self.selectedFolderId = self.rootFolderId
       }
@@ -457,24 +484,10 @@ export default {
       this.$bus.$emit('searchNote', searchStr)
     },
 
-    selectRecent () {
-      if (this.selectedFolderId === this.recentFolderId) return
+    selectSysFolder (folderId) {
+      if (this.selectedFolderId === folderId) return
 
-      this.selectAndRefresh(this.recentFolderId, '')
-      this.$refs.tree.store.setCurrentNode('')
-    },
-
-    selectStarred () {
-      if (this.selectedFolderId === this.starFolderId) return
-
-      this.selectAndRefresh(this.starFolderId, '')
-      this.$refs.tree.store.setCurrentNode('')
-    },
-
-    selectTrash () {
-      if (this.selectedFolderId === this.trashFolderId) return
-
-      this.selectAndRefresh(this.trashFolderId, '')
+      this.selectAndRefresh(folderId, '')
       this.$refs.tree.store.setCurrentNode('')
     },
 
