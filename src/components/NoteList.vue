@@ -16,7 +16,10 @@
         <p class="list-item-desc">
           {{listItem.digest | truncate(100)}}
         </p>
-        <h5 class="list-item-time">{{listItem.updated_at | fmtDate}} {{listItem.folder_name}}</h5>
+        <h5 class="list-item-time">
+          <i class="material-icons list-item-icon-size" v-show="listItem.has_attachment">attach_file</i>
+          {{listItem.updated_at | fmtDate}} {{listItem.folder_name}}
+        </h5>
       </div>
     </div>
     <div id="list-loader">
@@ -70,6 +73,13 @@
 
 .list-item-time {
   color: #999;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.list-item-icon-size {
+  font-size: 16px;
 }
 
 .list-item-subject {
