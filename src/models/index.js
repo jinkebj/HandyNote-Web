@@ -67,6 +67,14 @@ Model.updateFolder = (id, params) => {
   return http.post(BaseAPIUrl + '/folders/' + id, params)
 }
 
+Model.orderFolder = (ids) => {
+  const jsonRequest = {
+    action: 'adjust_order',
+    ids: ids
+  }
+  return http.post(BaseAPIUrl + '/folders/action', jsonRequest)
+}
+
 Model.deleteFolder = (id) => {
   return http.delete(BaseAPIUrl + '/folders/' + id)
 }

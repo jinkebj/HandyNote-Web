@@ -42,7 +42,8 @@
 
     <el-tree class="my-folder" :data="noteFolders" :props="defaultProps" node-key="id" ref="tree" :indent="10"
       default-expand-all highlight-current :expand-on-click-node="false" :render-content="renderContent"
-      @node-click="selectFolder" @node-expand="updateScrollBar" @node-collapse="updateScrollBar">
+      @node-click="selectFolder" @node-expand="updateScrollBar" @node-collapse="updateScrollBar"
+      draggable :allow-drop="allowDrop" :allow-drag="allowDrag" @node-drop="handleDrop">
     </el-tree>
 
     <div class="my-folder-adv" :class="selectedFolderId === trashFolderId ? 'my-folder-adv-selected' : 'my-folder-adv-unselected'"
@@ -186,6 +187,11 @@
 }
 
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content .el-icon-setting {
+  color: #FFFFFF;
+}
+
+.el-tree-node .is-drop-inner > .el-tree-node__content {
+  background-color: #E6A23C;
   color: #FFFFFF;
 }
 
@@ -541,6 +547,59 @@ export default {
       setTimeout(function () {
         self.scrollBar.update()
       }, 500)
+    },
+
+    allowDrag (draggingNode) {
+      return draggingNode.data.id !== this.rootFolderId
+    },
+
+    allowDrop (draggingNode, dropNode, type) {
+      if (dropNode.data.id === this.rootFolderId) {
+        return type === 'inner'
+      } else {
+        return true
+      }
+    },
+
+    handleDrop (draggingNode, dropNode, dropType, ev) {
+      const self = this
+
+      // check if folder parent changed
+      let draggingNodeParentBefore = draggingNode.data.ancestor_ids[draggingNode.data.ancestor_ids.length - 1]
+      let draggingNodeParentAfter = dropNode.data.ancestor_ids[dropNode.data.ancestor_ids.length - 1]
+      if (dropType === 'inner') {
+        draggingNodeParentAfter = dropNode.data.id
+      }
+
+      if (draggingNodeParentBefore !== draggingNodeParentAfter) {
+        Model.updateFolder(draggingNode.data.id, {
+          parent_id: draggingNodeParentAfter
+        })
+          .then(function (response) {
+            console.log('Move folder successfully!')
+          })
+          .catch(function (error) {
+            console.log(error)
+            self.$message.error('Move folder failed!')
+          })
+      }
+
+      // get all folder ids in display order
+      self.$refs.tree.setChecked(self.rootFolderId, true, true)
+      const folderIds = self.$refs.tree.getCheckedKeys()
+      folderIds.shift() // remove user root folder from array
+
+      Model.orderFolder(folderIds)
+        .then(function (response) {
+          self.$message({
+            message: 'Order folder successfully!',
+            type: 'success'
+          })
+        })
+        .catch(function (error) {
+          console.log(error)
+          self.$message.error('Order folder failed!')
+        })
     },
 
     renderContent (h, { node, data, store }) {
